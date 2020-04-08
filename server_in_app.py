@@ -1,12 +1,6 @@
 import json
 
 
-users = {
-    #'Name_user': 'token'
-    'Bob': '38rhh2824r2b27',
-}
-
-
 def client_wrapper(user_name, user_secret, command, data=None):
     user_list = {
         "count": 2,
