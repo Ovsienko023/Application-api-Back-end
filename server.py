@@ -4,17 +4,23 @@ from server_in_app import client_wrapper
 app = Flask(__name__)
 
 
-users = {
-    #'Name_user': 'token'
-    'Bob': '38rhh2824r2b27',
-}
-
-
 def post_request(command):
     data = request.json
-    answer = client_wrapper(command, data=data)
+    headers = request.headers
+    user_name = headers['UserName']
+    user_secret =  headers['UserSecret']
+
+    answer = client_wrapper(user_name, user_secret, command, data=data)
     if answer:
         return {"ok":True}
+
+def get_request(command):
+    headers = request.headers
+    user_name = headers['UserName']
+    user_secret =  headers['UserSecret']
+    
+    answer = client_wrapper(user_name, user_secret, command)
+    return answer
 
 
 @app.route('/api/v1/info')
@@ -29,7 +35,10 @@ def user_list():
     """ GET all user """
 
     command = 'user_list'
-    return client_wrapper(command)
+    # headers = request.headers
+    # UserName = headers['UserName']
+    # UserSecret =  headers['UserSecret'])
+    return get_request(command)
 
 
 @app.route('/api/v1/board/create', methods=['POST'])
@@ -60,7 +69,7 @@ def board_list():
     """ GET all board """
 
     command = 'board_list'
-    return client_wrapper(command)
+    return get_request(command)
 
 
 @app.route('/api/v1/card/create', methods=['POST'])
@@ -105,7 +114,7 @@ def report():
     """
 
     command = 'report'
-    return client_wrapper(command)
+    return get_request(command)
 
 
 app.run()

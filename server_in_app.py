@@ -1,7 +1,13 @@
 import json
 
 
-def client_wrapper(command, data=None):
+users = {
+    #'Name_user': 'token'
+    'Bob': '38rhh2824r2b27',
+}
+
+
+def client_wrapper(user_name, user_secret, command, data=None):
     user_list = {
         "count": 2,
         "users": [{"username": "Петя",},
@@ -9,5 +15,5 @@ def client_wrapper(command, data=None):
     }
     if data == None:
         return user_list
-    print(data, command)
+    print(user_name, user_secret, data, command)
     return True
