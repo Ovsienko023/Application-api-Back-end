@@ -18,7 +18,7 @@ def get_request(command):
     headers = request.headers
     user_name = headers['UserName']
     user_secret =  headers['UserSecret']
-    
+
     answer = client_wrapper(user_name, user_secret, command)
     return answer
 
@@ -35,9 +35,6 @@ def user_list():
     """ GET all user """
 
     command = 'user_list'
-    # headers = request.headers
-    # UserName = headers['UserName']
-    # UserSecret =  headers['UserSecret'])
     return get_request(command)
 
 
