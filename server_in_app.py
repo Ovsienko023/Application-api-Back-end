@@ -12,9 +12,8 @@ def client_wrapper(user_name, user_secret, commands, data=None):
     #     return user_list
     print(user_name, user_secret, data, commands)
     data['user_name'] = user_name
-    print(type(data))
     obj = crete_class(data, clss)
-    obj.save_in_bd()
+    print(obj.board_id)
     # obj -->> app_in_bd 
     return True
 
@@ -22,5 +21,5 @@ def client_wrapper(user_name, user_secret, commands, data=None):
 def crete_class(data, clss):
     classes = {'board': Board, 'card': Card}
     new_cls = classes[clss]
-    new_cls.create_from_dict(data)
+    new_cls = new_cls.create_from_dict(data)
     return new_cls

@@ -74,7 +74,7 @@ def card_create():
     """
     {
         "title": "Развернуть PostgreSQL",
-        "board": "Доска разработчика",
+        "board": "Доска Разработчика",
         "status": "ToDo",
         "description": "Необходимо развернуть базу данных PostgreSQL",
         "assignee": "Username",

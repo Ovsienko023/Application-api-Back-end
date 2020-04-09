@@ -62,7 +62,7 @@ def get_cards():
     return cards
 
 
-print(get_users(), get_boards(), get_cards())
+print(get_boards())
 
 
 
