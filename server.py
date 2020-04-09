@@ -100,7 +100,7 @@ def card_update():
     return post_request(command)
 
 
-@app.route('/api/v1//report/cards_by_column')
+@app.route('/api/v1/report/cards_by_column', methods=['POST'])
 def report():
     """ 
     {
@@ -110,8 +110,9 @@ def report():
     }
     """
 
-    command = 'report'
-    return get_request(command)
+    command = 'report_cards'
+    return post_request(command)
 
 
 app.run()
+

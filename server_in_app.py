@@ -1,13 +1,26 @@
 import json
+from core_logic import Board, Card
 
-
-def client_wrapper(user_name, user_secret, command, data=None):
-    user_list = {
-        "count": 2,
-        "users": [{"username": "Петя",},
-                {"username": "Вася",}]
-    }
-    if data == None:
-        return user_list
-    print(user_name, user_secret, data, command)
+def client_wrapper(user_name, user_secret, commands, data=None):
+    clss, command = commands.split('_')
+    # user_list = {
+    #     "count": 2,
+    #     "users": [{"username": "Петя",},
+    #             {"username": "Вася",}]
+    # }
+    # if data == None:
+    #     return user_list
+    print(user_name, user_secret, data, commands)
+    data['user_name'] = user_name
+    print(type(data))
+    obj = crete_class(data, clss)
+    obj.save_in_bd()
+    # obj -->> app_in_bd 
     return True
+
+
+def crete_class(data, clss):
+    classes = {'board': Board, 'card': Card}
+    new_cls = classes[clss]
+    new_cls.create_from_dict(data)
+    return new_cls
