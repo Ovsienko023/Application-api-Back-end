@@ -59,15 +59,69 @@ class Card:
                 return records[0][0]
 
 
-class Estimation(int):
-    """Descriptor"""
+class Estimation:
+    def __init__(self, num, cal):
+        self.pnum = num
+        self.cal = cal
+        if self.cal == 'd':
+            self.num = num * 8 
+        if self.cal == 'w':
+            self.num = num * 40
+        if self.cal == 'm':
+            self.num = num * 160 
+        if self.cal == 'h':
+            self.num = num
+    
+    def __add__(self, obj):
+        if 7 < (self.num + obj.num) < 40:
+            a = 1
+            b = (self.num + obj.num) - 8
+            while True:
+                if b > 7:
+                    a += 1
+                    b -= 8
+                else:
+                    return f'{a}d{b}h'
+                    
+        if 39 < (self.num + obj.num) < 160:
+            a = 1
+            b = 0
+            c = (self.num + obj.num) - 40
+            while True:
+                if c > 7:
+                    b += 1
+                    c -= 8
+                    if b > 4:
+                        a += 1
+                        b -= 5
+                else:
+                    return f'{a}w{b}d{c}h'
+                
+        if (self.num + obj.num) >= 160:
+            a = 1
+            b = 0
+            c = 0
+            d = (self.num + obj.num) - 160
+            while True:
+                if d > 7:
+                    c += 1
+                    d -= 8
+                    if c > 4:
+                        b += 1
+                        c -= 5
+                        if b > 3:
+                            a += 1
+                            b -= 4
+                else:
+                    return f'{a}m{b}w{c}d{d}h'
+        
+    def __str__(self):
+        return str(self.pnum) + self.cal
+
+    def __repr__(self):
+        return str(self.pnum) + self.cal
 
 
 
 
-# user1 = User('Bob', '38rhh2824r2b27')
-# board = Board('Bob', 'Доска разработчика', ["ToDo", "InProgress", "Done"])
-# card = Card('Развернуть PostgreSQL', 'Доска разработчика', 'ToDo', 'Необходимо развернуть базу данных PostgreSQL', 'Jeck', '3h')
 
-# print(card.status)
-# print(board.columns)
