@@ -1,6 +1,7 @@
 import json
 from core_logic import Board, Card
-from app_in_bd import get_users
+from app_in_bd import get_users, delete
+
 
 def client_wrapper(user_name, user_secret, commands, data=None):
     clss, command = commands.split('_')
@@ -18,6 +19,11 @@ def client_wrapper(user_name, user_secret, commands, data=None):
         obj = crete_class(data, clss, user_name)
         return f'{obj.save_in_bd()}'
 
+    if command == 'delete':
+        print(data, clss)
+        status = str(delete(data, clss))
+        return status
+
     return {}
 
 
@@ -28,6 +34,7 @@ def crete_class(data, clss, user_name):
     new_cls = new_cls.create_from_dict(data)
     return new_cls
 
+
 def report(data):
     '''return json with data cards in DB'''
     pass
@@ -35,7 +42,3 @@ def report(data):
 
 
 
- # #-----СОЗДАНИЕ КЛАССА ЕСЛИ ПРИХОДИТ create
-    # obj = crete_class(data, clss, user_name)
-    # print(obj.board_id)
-    # # obj -->> app_in_bd 

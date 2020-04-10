@@ -61,3 +61,18 @@ def get_cards():
                 _['board_id'] = board_id
                 cards['cards'].append(_)
     return cards
+
+
+def delete(data, tabl_name):
+    title = data['title']
+    if tabl_name == 'board':
+        tabl_name = 'Boards'
+    if tabl_name == 'card':
+        tabl_name = 'Cards'
+
+    with psycopg2.connect(**info_bd) as conn:
+        with conn.cursor() as cursor:
+            request = f"DELETE FROM {tabl_name} WHERE title = '{title}'"
+            cursor.execute(request)   
+            return cursor.statusmessage
+    

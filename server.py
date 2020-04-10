@@ -11,10 +11,14 @@ def post_request(command):
     user_secret =  headers['UserSecret']
 
     answer = client_wrapper(user_name, user_secret, command, data=data)
-    if answer == 'ok' or answer == 'INSERT 0 1':
-        return {"ok":True}
-    if answer == "Error":
+    if answer == "Error" or answer == 'DELETE 0':
         return {}
+
+    if answer == 'ok' or answer == 'INSERT 0 1' or answer:
+        return {"ok":True}
+    
+
+
 def get_request(command):
     headers = request.headers
     user_name = headers['UserName']
@@ -48,7 +52,7 @@ def board_creat():
     }
     response: {"ok": true}
     """
-    command = 'board_creat'
+    command = 'board_create'
     return post_request(command)
 
 
@@ -98,6 +102,16 @@ def card_update():
     """
 
     command = 'card_update'
+    return post_request(command)
+
+
+@app.route('/api/v1/card/delete', methods=['POST'])
+def card_delete():
+    """
+    {"title": "Name card"}
+    """
+
+    command = 'card_delete'
     return post_request(command)
 
 
