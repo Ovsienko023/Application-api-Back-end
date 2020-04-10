@@ -1,11 +1,14 @@
 import psycopg2
 
 
+info_bd = {'dbname': 'my_data_base', 'user': 'ovsienko023', 
+                            'password': '68471325', 'host':'localhost'}
+
+
 def get_users():
     users = {'users': []}
 
-    with psycopg2.connect(dbname='my_data_base', user='ovsienko023', 
-                            password='68471325', host='localhost') as conn:
+    with psycopg2.connect(**info_bd) as conn:
         with conn.cursor() as cursor:
             cursor.execute('SELECT * FROM Users')
             records = cursor.fetchall()
@@ -21,8 +24,7 @@ def get_users():
 def get_boards():
     boards = {'boards': []}
 
-    with psycopg2.connect(dbname='my_data_base', user='ovsienko023', 
-                            password='68471325', host='localhost') as conn:
+    with psycopg2.connect(**info_bd) as conn:
         with conn.cursor() as cursor:
             cursor.execute('SELECT * FROM Boards')
             records = cursor.fetchall()
@@ -41,8 +43,7 @@ def get_boards():
 def get_cards():
     cards = {'cards': []}
     
-    with psycopg2.connect(dbname='my_data_base', user='ovsienko023', 
-                            password='68471325', host='localhost') as conn:
+    with psycopg2.connect(**info_bd) as conn:
         with conn.cursor() as cursor:
             cursor.execute('SELECT * FROM Cards')
             records = cursor.fetchall()
@@ -62,7 +63,7 @@ def get_cards():
     return cards
 
 
-print(get_boards())
+
 
 
 

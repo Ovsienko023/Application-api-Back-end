@@ -1,6 +1,6 @@
 import time
 import psycopg2
-
+from app_in_bd import info_bd
 # class User:
 #     def __init__(self, user_name, user_secret):
 #         self.user_name = user_name
@@ -21,12 +21,18 @@ class Board:
     @classmethod
     def create_from_dict(cls, data):
         parameters = [data[parameter] for parameter in cls.required]
-        print(parameters)
         return cls(*parameters)
 
 
     def save_in_bd(self):
-        
+        with psycopg2.connect(** info_bd) as conn:
+            with conn.cursor() as cursor:
+                request = f"""INSERT INTO Boards (user_name, times, title, columns, board_id)
+                            VALUES ('{self.user_name}', '{self.times}',
+                            '{self.title}', '{self.columns}', {self.board_id})
+                """
+                cursor.execute(request)
+                print(cursor.statusmessage)
         print("отправленно")
 
 
@@ -50,13 +56,26 @@ class Card:
         return cls(*parameters)
 
     def get_board_id(self):
-        with psycopg2.connect(dbname='my_data_base', user='ovsienko023', 
-                            password='68471325', host='localhost') as conn:
+        with psycopg2.connect(** info_bd) as conn:
             with conn.cursor() as cursor:
                 request = "SELECT board_id FROM Boards where title ='{}'".format(self.board)
                 cursor.execute(request)
                 records = cursor.fetchall()
                 return records[0][0]
+    
+    def save_in_bd(self):
+        with psycopg2.connect(** info_bd) as conn:
+            with conn.cursor() as cursor:
+                request = f"""INSERT INTO Cards (user_name, times, title, board, status,
+                                                    description, assignee, estimation, board_id)
+                            VALUES ('{self.user_name}', '{self.times}',
+                            '{self.title}', '{self.board}', '{self.status}',
+                            '{self.description}', '{self.assignee}', '{self.estimation}', {self.board_id})
+                """
+                cursor.execute(request)
+                print(cursor.statusmessage)
+        print("отправленно")
+
 
 
 class Estimation:
@@ -121,7 +140,9 @@ class Estimation:
     def __repr__(self):
         return str(self.pnum) + self.cal
 
-
+# a = Card('Bob', 'flex', 'Доска Дизайнера', 'tru', 'qweqwe', 'mark', 'dasq')
+# a.save_in_bd()
+# print(a.board_id)
 
 
 
