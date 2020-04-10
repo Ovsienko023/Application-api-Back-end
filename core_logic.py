@@ -32,7 +32,7 @@ class Board:
                             '{self.title}', '{self.columns}', {self.board_id})
                 """
                 cursor.execute(request)
-                print(cursor.statusmessage)
+                return cursor.statusmessage
         print("отправленно")
 
 

@@ -11,9 +11,10 @@ def post_request(command):
     user_secret =  headers['UserSecret']
 
     answer = client_wrapper(user_name, user_secret, command, data=data)
-    if answer:
+    if answer == 'ok' or answer == 'INSERT 0 1':
         return {"ok":True}
-
+    if answer == "Error":
+        return {}
 def get_request(command):
     headers = request.headers
     user_name = headers['UserName']
@@ -110,7 +111,7 @@ def report():
     }
     """
 
-    command = 'report_cards'
+    command = 'cards_report'
     return post_request(command)
 
 
