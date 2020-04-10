@@ -14,7 +14,7 @@ def client_wrapper(user_name, user_secret, commands, data=None):
         return {"count" :len(get_users()['users']), 
                     "users": [{'username':i['user_name']} for i in get_users()['users']] }
     
-    if command == 'creat':
+    if command == 'create':
         obj = crete_class(data, clss, user_name)
         return f'{obj.save_in_bd()}'
 
