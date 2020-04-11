@@ -2,41 +2,16 @@ import requests
 import json
 
 
-#url = r'http://127.0.0.1:5000/api/v1/board/delete'
-#url = r'http://127.0.0.1:5000/api/v1/user/list'
-#url = r'http://127.0.0.1:5000/api/v1/report/cards_by_column'
-
-
-# data = {
-#     "title": "Доска Разработчика",
-# }
-
-
-# headers = {'UserName': 'Bob', 'UserSecret':'123'}
-
-
-# response = requests.post(url, json=data, headers=headers)
-# print(response.content)
-# #print(response.json())
-
-
-# response = requests.get(url)
-# print(response.json())
-
-# r = requests.get(url, headers=headers)
-# print(r.json())
-
-
 def create_board():
     url = r'http://127.0.0.1:5000/api/v1/board/create'
     headers = {'UserName': 'Bob', 'UserSecret':'123'}
     data = {
-        "title": "Доска Дизайнера",
+        "title": "Доска Дворника",
         "columns": [
-            "ToDo",
-            "InProgress",
-            "Done"
-] }
+            "Пойти",
+            "Убрать",
+            "Уйти"
+    ] }
 
     response = requests.post(url, json=data, headers=headers)
     print(response.content)
@@ -46,7 +21,7 @@ def delete_board():
     url = r'http://127.0.0.1:5000/api/v1/board/delete'
     headers = {'UserName': 'Bob', 'UserSecret':'123'}
     data = {
-        "title": "Доска Разработчика",
+        "title": "Доска Дворника",
     }
 
     response = requests.post(url, json=data, headers=headers)
@@ -57,15 +32,46 @@ def delete_card():
     url = r'http://127.0.0.1:5000/api/v1/card/delete'
     headers = {'UserName': 'Bob', 'UserSecret':'123'}
     data = {
-        "title": "flex",
+        "title": "Развернуть PostgreSQL",
+        "board": "Доска Дизайнера"
     }
 
     response = requests.post(url, json=data, headers=headers)
     print(response.content)
 
 
-# create_board()
-#delete_board()
-delete_card()
+def create_card():
+    url = r'http://127.0.0.1:5000/api/v1/card/create'
+    headers = {'UserName': 'Bob', 'UserSecret':'123'}
+    data = {
+        "title": "Развернуть PostgreSQL",
+        "board": "Доска Дизайнера",
+        "status": "ToDo",
+        "description": "Необходимо нарисовать цветок",
+        "assignee": "Bob",
+        "estimation": "8h"
+    }
+    response = requests.post(url, json=data, headers=headers)
+    print(response.content)
 
+
+def update_card():
+    url = r'http://127.0.0.1:5000/api/v1/card/update'
+    headers = {'UserName': 'Bob', 'UserSecret':'123'}
+    data = {
+        "title": "Развернуть PostgreSQL",
+        "board": "Доска Разработчик",
+        "status": "Done_"
+    }
+
+    response = requests.post(url, json=data, headers=headers)
+    print(response.content)
+
+
+
+#delete_board()
+create_board()
+#delete_card()
+#update_card()
+#create_card()
 

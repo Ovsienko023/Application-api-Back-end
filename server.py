@@ -11,7 +11,7 @@ def post_request(command):
     user_secret =  headers['UserSecret']
 
     answer = client_wrapper(user_name, user_secret, command, data=data)
-    if answer == "Error" or answer == 'DELETE 0':
+    if answer == "Error" or answer == 'DELETE 0' or answer == '':
         return {}
 
     if answer == 'ok' or answer == 'INSERT 0 1' or answer:
@@ -108,7 +108,10 @@ def card_update():
 @app.route('/api/v1/card/delete', methods=['POST'])
 def card_delete():
     """
-    {"title": "Name card"}
+    {
+    "title": "Развернуть PostgreSQL",
+    "board": "Доска разработчика"
+    }
     """
 
     command = 'card_delete'

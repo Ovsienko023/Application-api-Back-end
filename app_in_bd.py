@@ -66,13 +66,66 @@ def get_cards():
 def delete(data, tabl_name):
     title = data['title']
     if tabl_name == 'board':
-        tabl_name = 'Boards'
+        with psycopg2.connect(**info_bd) as conn:
+            with conn.cursor() as cursor:
+                request = f"DELETE FROM Boards WHERE title = '{title}'"
+                cursor.execute(request)   
+                return cursor.statusmessage
     if tabl_name == 'card':
-        tabl_name = 'Cards'
+        board = data['board']
+        return delete_card(title, board)
 
+def get_card(name_card, name_board):
+    try:
+        with psycopg2.connect(**info_bd) as conn:
+            with conn.cursor() as cursor:
+                request = f""" SELECT user_name, times, title,
+                                board, status, description, assignee,
+                                estimation, board_id, last_update_at, last_update_by
+                                FROM Cards 
+                                where title = '{name_card}'
+                                AND board = '{name_board}'
+                        """
+                cursor.execute(request)
+                records = cursor.fetchall()
+                for typles in records:
+                    (user_name, times, title, board,
+                    status, description, assignee, estimation,
+                    board_id, last_update_at, last_update_by) = typles
+                    
+                    card = dict()
+                    card['user_name'] = user_name
+                    card['times'] = times
+                    card['title'] = title
+                    card['board'] = board
+                    card['status'] = status
+                    card['description'] = description
+                    card['assignee'] = assignee
+                    card['estimation'] = estimation
+                    card['board_id'] = board_id
+                    card['last_update_at'] = last_update_at
+                    card['last_update_by'] = last_update_by
+        delete_card(title, board)
+        return card
+    except UnboundLocalError:
+        return ''
+
+
+def delete_card(title, board):
     with psycopg2.connect(**info_bd) as conn:
         with conn.cursor() as cursor:
-            request = f"DELETE FROM {tabl_name} WHERE title = '{title}'"
-            cursor.execute(request)   
+            request = f"DELETE FROM Cards WHERE title = '{title}' and board = '{board}'"
+            cursor.execute(request)
             return cursor.statusmessage
-    
+
+
+def is_board(board_name):
+    with psycopg2.connect(**info_bd) as conn:
+        with conn.cursor() as cursor:
+            request = f"SELECT title FROM Boards where title = '{board_name}'"
+            cursor.execute(request)
+            status = cursor.statusmessage.split(' ')[1]
+            if status == '0':
+                return True
+            else: 
+                return False
