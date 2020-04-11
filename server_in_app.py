@@ -1,16 +1,16 @@
 import json
 import time
-from core_logic import Board, Card, ErrorApi
-from app_in_bd import get_users, get_card, delete
+from core_logic import Board, Card, Estimation, ErrorApi
+from app_in_bd import get_users, get_card, delete, report
 
 
 def client_wrapper(user_name, user_secret, commands, data=None):
     clss, command = commands.split('_')
-    print()
     print(command)
     try:
         if command == 'report':
-            return report(data)
+            lst_report = report(data)
+            return pars_for_rep(lst_report)
 
         if commands == 'user_list':
             return {"count" :len(get_users()['users']), 
@@ -30,6 +30,44 @@ def client_wrapper(user_name, user_secret, commands, data=None):
             return status
     except ErrorApi:
         return ''
+
+
+def pars_for_rep(lst_card):
+    json_card = dict()
+    sum_estimation = list()
+    lst = list()
+    for card in lst_card:
+        (user_name, times, title, board,
+        status, description, assignee, estimation,
+        board_id, last_update_at, last_update_by) = card
+
+        sum_estimation.append(estimation)
+        estimation = (estimation[:-1], estimation[-1:])
+        lst.append({
+                    "title": title,
+                    "board": board,
+                    "status": status,
+                    "description": description, 
+                    "assignee": assignee,
+                    "estimation": str(Estimation(*estimation).pars()),
+                    "created_at": times,#### Сделать перевод
+                    "created_by": user_name,
+                    "last_updated_at": last_update_at,#### Сделать перевод
+                    "last_updated_by": last_update_by
+                    })
+    sum_e = Estimation(0, 'h')
+    for estam in sum_estimation:
+        sum_e += Estimation(*(estam[:-1], estam[-1:]))
+    json_card['board'] = board
+    json_card['column'] = status
+    json_card['assignee'] = assignee
+    json_card['count'] = len(lst_card)
+    json_card['estimation'] = str(sum_e.pars())
+    json_card['cards'] = lst
+    print(json_card)
+    json_card = json.dumps(json_card)
+    return json_card
+    
 
 
 def crete_class(data, clss, user_name):
@@ -74,9 +112,6 @@ def update_obj(data, obj, user_name):
             raise ErrorApi
     obj.last_update_by = user_name
     return obj
-def report(data):
-    '''return json with data cards in DB'''
-    pass
 
 
 

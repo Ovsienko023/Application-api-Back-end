@@ -1,6 +1,6 @@
 import requests
 import json
-
+import pprint
 
 def create_board():
     url = r'http://127.0.0.1:5000/api/v1/board/create'
@@ -44,12 +44,12 @@ def create_card():
     url = r'http://127.0.0.1:5000/api/v1/card/create'
     headers = {'UserName': 'Bob', 'UserSecret':'123'}
     data = {
-        "title": "Убрать в доме",
-        "board": "Доска Дворника",
-        "status": "Убрать",
-        "description": "Необходимо всё убрать",
-        "assignee": "Bob",
-        "estimation": "4d"
+        "title": "Кукуха",
+        "board": "Доска Дизайнера",
+        "status": "ToDo",
+        "description": "Необходимо за весь карантин не поехать кукухой ",
+        "assignee": "Mark",
+        "estimation": "1m"
     }
     response = requests.post(url, json=data, headers=headers)
     print(response.content)
@@ -68,11 +68,25 @@ def update_card():
     print(response.content)
 
 
+def report():
+    url = r'http://127.0.0.1:5000/api/v1/report/cards_by_column'
+    headers = {'UserName': 'Bob', 'UserSecret':'123'}
+    data = {
+        "board": "Доска Дизайнера",
+        "column": "ToDo",
+        "assignee": "Mark"
+    }
+
+    response = requests.post(url, json=data, headers=headers)
+    print(response.json())
+
+    #pprint()
+
 
 #delete_board()
 #create_board()
 #delete_card()
 #create_card()
-update_card()
-
+#update_card()
+report()
 

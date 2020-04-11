@@ -1,5 +1,5 @@
 import psycopg2
-
+#from core_logic import Estimation
 
 info_bd = {'dbname': 'my_data_base', 'user': 'ovsienko023', 
                             'password': '68471325', 'host':'localhost'}
@@ -129,3 +129,23 @@ def is_board(board_name):
                 return True
             else: 
                 return False
+
+def report(data):
+    status = data['column']
+    name_board = data['board']
+    user = data['assignee']
+    with psycopg2.connect(**info_bd) as conn:
+        with conn.cursor() as cursor:
+            request = f""" SELECT user_name, times, title,
+                                board, status, description, assignee,
+                                estimation, board_id, last_update_at, last_update_by
+                                FROM Cards 
+                                where assignee = '{user}'
+                                AND status = '{status}'
+                                AND board = '{name_board}'
+                        """
+            cursor.execute(request)
+            records = cursor.fetchall()
+            return records
+            
+    

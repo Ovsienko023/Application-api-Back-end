@@ -14,8 +14,11 @@ def post_request(command):
     if answer == "Error" or answer == 'DELETE 0' or answer == '':
         return {}
 
-    if answer == 'ok' or answer == 'INSERT 0 1' or answer:
+    if answer == 'ok' or answer == 'INSERT 0 1':
         return {"ok":True}
+    
+    if answer:
+        return answer
     
 
 
