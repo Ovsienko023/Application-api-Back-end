@@ -47,6 +47,7 @@ def update_card(data, user_name):
         name_board = data['board']
         card = get_card(name_card, name_board)
         obj_card = Card.create_from_dict(card)
+        print(obj_card.estimation)
         obj_card = update_obj(data, obj_card, user_name)
         status = obj_card.save_in_bd()
         return status

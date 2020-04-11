@@ -33,7 +33,7 @@ def delete_card():
     headers = {'UserName': 'Bob', 'UserSecret':'123'}
     data = {
         "title": "Развернуть PostgreSQL",
-        "board": "Доска Дизайнера"
+        "board": "Доска Разработчика"
     }
 
     response = requests.post(url, json=data, headers=headers)
@@ -44,12 +44,12 @@ def create_card():
     url = r'http://127.0.0.1:5000/api/v1/card/create'
     headers = {'UserName': 'Bob', 'UserSecret':'123'}
     data = {
-        "title": "Развернуть PostgreSQL",
-        "board": "Доска Дизайнера",
-        "status": "ToDo",
-        "description": "Необходимо нарисовать цветок",
+        "title": "Убрать в доме",
+        "board": "Доска Дворника",
+        "status": "Убрать",
+        "description": "Необходимо всё убрать",
         "assignee": "Bob",
-        "estimation": "8h"
+        "estimation": "4d"
     }
     response = requests.post(url, json=data, headers=headers)
     print(response.content)
@@ -57,11 +57,11 @@ def create_card():
 
 def update_card():
     url = r'http://127.0.0.1:5000/api/v1/card/update'
-    headers = {'UserName': 'Bob', 'UserSecret':'123'}
+    headers = {'UserName': 'Karl', 'UserSecret':'289'}
     data = {
-        "title": "Развернуть PostgreSQL",
-        "board": "Доска Разработчик",
-        "status": "Done_"
+        "title": "Убрать в доме",
+        "board": "Доска Дворника",
+        "assignee": "Karl"
     }
 
     response = requests.post(url, json=data, headers=headers)
@@ -70,8 +70,9 @@ def update_card():
 
 
 #delete_board()
-create_board()
+#create_board()
 #delete_card()
-#update_card()
 #create_card()
+update_card()
+
 
