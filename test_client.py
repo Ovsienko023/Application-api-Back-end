@@ -72,7 +72,7 @@ def report():
     url = r'http://127.0.0.1:5000/api/v1/report/cards_by_column'
     headers = {'UserName': 'Bob', 'UserSecret':'123'}
     data = {
-        "board": "Доска Дизайнера",
+        "board": "Доска Дизайнер",
         "column": "ToDo",
         "assignee": "Mark"
     }

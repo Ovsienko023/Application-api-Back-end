@@ -12,7 +12,7 @@ def post_request(command):
 
     answer = client_wrapper(user_name, user_secret, command, data=data)
     if answer == "Error" or answer == 'DELETE 0' or answer == '':
-        return {}
+        return {"Error": "Value"}
 
     if answer == 'ok' or answer == 'INSERT 0 1':
         return {"ok":True}
