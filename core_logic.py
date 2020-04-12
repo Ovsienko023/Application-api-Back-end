@@ -188,3 +188,7 @@ class Estimation:
 
 class ErrorApi(Exception):
     pass
+
+
+class AuthenticationError(Exception):
+    pass

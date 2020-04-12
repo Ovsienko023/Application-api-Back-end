@@ -1,10 +1,15 @@
 import json
 import time
-from core_logic import Board, Card, Estimation, ErrorApi
+from core_logic import Board, Card, Estimation, ErrorApi, AuthenticationError
 from app_in_bd import get_users, get_card, get_boards, delete, report
 
 
 def client_wrapper(user_name, user_secret, commands, data=None):
+    try:
+        authentication(user_name, user_secret)
+    except AuthenticationError:
+        return 'Authentication Error'
+
     clss, command = commands.split('_')
     print(command)
     try:
@@ -122,5 +127,10 @@ def update_obj(data, obj, user_name):
     return obj
 
 
-
+def authentication(name_user, token):
+    for user in get_users()['users']:
+        if user.get('user_name') == name_user:
+            if user.get('user_secret') == token:
+                return True
+    raise AuthenticationError
 

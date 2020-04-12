@@ -87,8 +87,8 @@ def board_list():
 
 
     response = requests.get(url, headers=headers)
-    print(response.json())
-    return response.json()
+    print(response.content)
+    
 
 
 

@@ -11,6 +11,7 @@ def post_request(command):
     user_secret =  headers['UserSecret']
 
     answer = client_wrapper(user_name, user_secret, command, data=data)
+
     if answer == "Error" or answer == 'DELETE 0' or answer == '':
         return {"Error": "Value"}
 
