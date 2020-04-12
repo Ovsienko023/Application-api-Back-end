@@ -88,7 +88,9 @@ def crete_class(data, clss, user_name):
     data['times'] = time.time()
     classes = {'board': Board, 'card': Card}
     new_cls = classes[clss]
+    print(new_cls)
     new_cls = new_cls.create_from_dict(data)
+    print(new_cls)
     return new_cls
 
 

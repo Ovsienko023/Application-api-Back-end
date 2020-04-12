@@ -15,7 +15,7 @@ def post_request(command):
     if answer == "Error" or answer == 'DELETE 0' or answer == '':
         return {"Error": "Value"}
 
-    if answer == 'ok' or answer == 'INSERT 0 1':
+    if answer == 'ok' or answer == 'INSERT 0 1' or answer == 'DELETE 1':
         return {"ok":True}
     
     if answer:

@@ -6,7 +6,7 @@ def create_board():
     url = r'http://127.0.0.1:5000/api/v1/board/create'
     headers = {'UserName': 'Bob', 'UserSecret':'123'}
     data = {
-        "title": "Доска Дворника",
+        "title": "Доска Дворника 2",
         "columns": [
             "Пойти",
             "Убрать",
@@ -21,7 +21,7 @@ def delete_board():
     url = r'http://127.0.0.1:5000/api/v1/board/delete'
     headers = {'UserName': 'Bob', 'UserSecret':'123'}
     data = {
-        "title": "Доска Дворника",
+        "title": "Доска Дворника 2",
     }
 
     response = requests.post(url, json=data, headers=headers)
@@ -32,8 +32,8 @@ def delete_card():
     url = r'http://127.0.0.1:5000/api/v1/card/delete'
     headers = {'UserName': 'Bob', 'UserSecret':'123'}
     data = {
-        "title": "Развернуть PostgreSQL",
-        "board": "Доска Разработчика"
+        "title": "Painter_",
+        "board": "Доска Дизайнера"
     }
 
     response = requests.post(url, json=data, headers=headers)
@@ -44,7 +44,7 @@ def create_card():
     url = r'http://127.0.0.1:5000/api/v1/card/create'
     headers = {'UserName': 'Bob', 'UserSecret':'123'}
     data = {
-        "title": "Кукуха",
+        "title": "Painter_",
         "board": "Доска Дизайнера",
         "status": "ToDo",
         "description": "Необходимо за весь карантин не поехать кукухой ",
@@ -57,11 +57,11 @@ def create_card():
 
 def update_card():
     url = r'http://127.0.0.1:5000/api/v1/card/update'
-    headers = {'UserName': 'Karl', 'UserSecret':'289'}
+    headers = {'UserName': 'Jeck', 'UserSecret':'321'}
     data = {
-        "title": "Убрать в доме",
-        "board": "Доска Дворника",
-        "assignee": "Karl"
+        "title": "Painter_",
+        "board": "Доска Дизайнера",
+        "assignee": "Karlos"
     }
 
     response = requests.post(url, json=data, headers=headers)
@@ -87,16 +87,18 @@ def board_list():
 
 
     response = requests.get(url, headers=headers)
-    print(response.content)
+    print(response.json())
     
 
 
 
-
-#delete_board()
-#create_board()
-#delete_card()
-#create_card()
-#update_card()
-#report()
+create_board()
+delete_board()
 board_list()
+
+create_card()
+update_card()
+delete_card()
+
+report()
+

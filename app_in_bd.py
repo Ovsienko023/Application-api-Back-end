@@ -118,6 +118,13 @@ def delete_card(title, board):
             cursor.execute(request)
             return cursor.statusmessage
 
+def delete_board(title, user_name):
+    with psycopg2.connect(**info_bd) as conn:
+        with conn.cursor() as cursor:
+            request = f"DELETE FROM Boards WHERE title = '{title}' and user_name = '{user_name}'"
+            cursor.execute(request)
+            return cursor.statusmessage
+
 
 def is_board(board_name):
     with psycopg2.connect(**info_bd) as conn:
@@ -125,10 +132,23 @@ def is_board(board_name):
             request = f"SELECT title FROM Boards where title = '{board_name}'"
             cursor.execute(request)
             status = cursor.statusmessage.split(' ')[1]
+            if status == '1':
+                return False
+            if status == '0': 
+                return True
+
+def is_card(card_name, board_name):
+    """ func is_card reverse """
+    with psycopg2.connect(**info_bd) as conn:
+        with conn.cursor() as cursor:
+            request = f"SELECT title FROM Cards where title = '{card_name}' AND board = '{board_name}'"
+            cursor.execute(request)
+            status = cursor.statusmessage.split(' ')[1]
             if status == '0':
                 return True
             else: 
                 return False
+
 
 def report(data):
     status = data['column']
