@@ -2,26 +2,7 @@ import unittest
 from core_logic import Estimation, Board, Card
 from app_in_bd import delete_card, delete_board, is_card, is_board, report
 from flask import request
-# from test_client import *
-
-# class FlaskrTestCase(unittest.TestCase):
-    
-#     def setUp(self):
-#         server.app.testing = True
-#         self.app = server.app.test_client()
-    
-#     def test_info(self):
-#         result = self.app.get('/api/v1/info')
-#         self.assertEqual(result.data, b'This is api gives access to the task management application')
-
-    # def tes_get_boards_list(self):
-    #     result = self.app.get('/api/v1/board/list')
-    #     print(result)
-    #     self.assertEqual(result.data, b'qwe' )
-        
-        
-
-
+       
 class TestEstimation(unittest.TestCase):
 
     def setUp(self):
@@ -193,7 +174,25 @@ class Test_func_app_in_bd(unittest.TestCase):
         if widget:
             self.assertIsInstance(widget, list)
 
-    
 
+# from test_client import *
+
+# class FlaskrTestCase(unittest.TestCase):
+    
+#     def setUp(self):
+#         server.app.testing = True
+#         self.app = server.app.test_client()
+    
+#     def test_info(self):
+#         result = self.app.get('/api/v1/info')
+#         self.assertEqual(result.data, b'This is api gives access to the task management application')
+
+    # def tes_get_boards_list(self):
+    #     result = self.app.get('/api/v1/board/list')
+    #     print(result)
+    #     self.assertEqual(result.data, b'qwe' )
+ 
+
+    
 if __name__ == '__main__':
     unittest.main()
