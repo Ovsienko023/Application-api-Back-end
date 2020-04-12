@@ -80,7 +80,17 @@ def report():
     response = requests.post(url, json=data, headers=headers)
     print(response.json())
 
-    #pprint()
+
+def board_list():
+    url = r'http://127.0.0.1:5000/api/v1/board/list'
+    headers = {'UserName': 'Bob', 'UserSecret':'123'}
+
+
+    response = requests.get(url, headers=headers)
+    print(response.json())
+    return response.json()
+
+
 
 
 #delete_board()
@@ -88,5 +98,5 @@ def report():
 #delete_card()
 #create_card()
 #update_card()
-report()
-
+#report()
+board_list()

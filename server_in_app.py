@@ -1,7 +1,7 @@
 import json
 import time
 from core_logic import Board, Card, Estimation, ErrorApi
-from app_in_bd import get_users, get_card, delete, report
+from app_in_bd import get_users, get_card, get_boards, delete, report
 
 
 def client_wrapper(user_name, user_secret, commands, data=None):
@@ -28,6 +28,11 @@ def client_wrapper(user_name, user_secret, commands, data=None):
         if command == 'update':
             status = update_card(data, user_name)
             return status
+
+        if commands == 'board_list':
+            status = get_boards()
+            return status
+        
     except ErrorApi:
         return ''
 
