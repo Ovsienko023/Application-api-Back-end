@@ -1,8 +1,17 @@
 import psycopg2
-#from core_logic import Estimation
+import os
+import json
 
-info_bd = {'dbname': 'my_data_base', 'user': 'ovsienko023', 
-                            'password': '68471325', 'host':'localhost'}
+
+def config_app():
+    path = os.getcwd() + "/config.txt"
+    with open(path) as config:
+        json_str = config.read()
+        #print(config.read())
+        return json.loads(json_str)
+
+info_bd = config_app()['Data_Base']
+
 
 
 def get_users():

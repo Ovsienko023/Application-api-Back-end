@@ -1,8 +1,11 @@
 from flask import Flask, request
-from server_in_app import client_wrapper
+import sys
+sys.path.insert(0, 'Application-api/src')
+from server.server_in_app import client_wrapper
+from logic.app_in_bd import config_app
+
 
 app = Flask(__name__)
-
 
 def post_request(command):
     data = request.json
@@ -31,12 +34,6 @@ def get_request(command):
     answer = client_wrapper(user_name, user_secret, command)
     return answer
 
-
-@app.route('/api/v1/info')
-def info():
-    with open('read_me.txt') as r:
-        message = r.read()
-    return message
 
 
 @app.route('/api/v1/user/list')
@@ -136,5 +133,5 @@ def report():
     return post_request(command)
 
 
-app.run()
-
+info_server = config_app()['server']
+app.run(**info_server)

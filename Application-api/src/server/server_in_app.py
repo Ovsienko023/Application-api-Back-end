@@ -1,7 +1,8 @@
 import json
 import time
-from core_logic import Board, Card, Estimation, ErrorApi, AuthenticationError
-from app_in_bd import get_users, get_card, get_boards, delete, report
+import os
+from logic.core_logic import Board, Card, Estimation, ErrorApi, AuthenticationError
+from logic.app_in_bd import get_users, get_card, get_boards, delete, report
 
 
 def client_wrapper(user_name, user_secret, commands, data=None):
@@ -76,7 +77,6 @@ def pars_for_rep(lst_card):
         json_card['count'] = len(lst_card)
         json_card['estimation'] = str(sum_e.pars())
         json_card['cards'] = lst
-        print(json_card)
         json_card = json.dumps(json_card)
         return json_card
     except UnboundLocalError:
@@ -88,9 +88,7 @@ def crete_class(data, clss, user_name):
     data['times'] = time.time()
     classes = {'board': Board, 'card': Card}
     new_cls = classes[clss]
-    print(new_cls)
     new_cls = new_cls.create_from_dict(data)
-    print(new_cls)
     return new_cls
 
 
@@ -100,7 +98,6 @@ def update_card(data, user_name):
         name_board = data['board']
         card = get_card(name_card, name_board)
         obj_card = Card.create_from_dict(card)
-        print(obj_card.estimation)
         obj_card = update_obj(data, obj_card, user_name)
         status = obj_card.save_in_bd()
         return status
@@ -135,4 +132,5 @@ def authentication(name_user, token):
             if user.get('user_secret') == token:
                 return True
     raise AuthenticationError
+
 

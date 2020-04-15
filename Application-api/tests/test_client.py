@@ -1,6 +1,6 @@
 import requests
 import json
-import pprint
+
 
 def create_board():
     url = r'http://127.0.0.1:5000/api/v1/board/create'
@@ -33,7 +33,7 @@ def delete_card():
     headers = {'UserName': 'Bob', 'UserSecret':'123'}
     data = {
         "title": "Painter_",
-        "board": "Доска Дизайнера"
+        "board": "Доска Дворника 2"
     }
 
     response = requests.post(url, json=data, headers=headers)
@@ -45,8 +45,8 @@ def create_card():
     headers = {'UserName': 'Bob', 'UserSecret':'123'}
     data = {
         "title": "Painter_",
-        "board": "Доска Дизайнера",
-        "status": "ToDo",
+        "board": "Доска Дворника 2",
+        "status": "Пойти",
         "description": "Необходимо за весь карантин не поехать кукухой ",
         "assignee": "Mark",
         "estimation": "1m"
@@ -57,10 +57,10 @@ def create_card():
 
 def update_card():
     url = r'http://127.0.0.1:5000/api/v1/card/update'
-    headers = {'UserName': 'Jeck', 'UserSecret':'321'}
+    headers = {'UserName': 'Bob', 'UserSecret':'123'}
     data = {
         "title": "Painter_",
-        "board": "Доска Дизайнера",
+        "board": "Доска Дворника 2",
         "assignee": "Karlos"
     }
 
@@ -72,9 +72,9 @@ def report():
     url = r'http://127.0.0.1:5000/api/v1/report/cards_by_column'
     headers = {'UserName': 'Bob', 'UserSecret':'123'}
     data = {
-        "board": "Доска Дизайнера",
-        "column": "ToDo",
-        "assignee": "Mark"
+        "board": "Доска Дворника 2",
+        "column": "Пойти",
+        "assignee": "Karlos"
     }
 
     response = requests.post(url, json=data, headers=headers)
@@ -90,15 +90,17 @@ def board_list():
     print(response.json())
     
 
+def main():
 
+    create_board()
+    board_list()
+    create_card()
+    update_card()
 
-create_board()
-delete_board()
-board_list()
+    report()
 
-create_card()
-update_card()
-delete_card()
+    delete_card()
+    delete_board()
+    print('Ok')
 
-report()
-
+main()

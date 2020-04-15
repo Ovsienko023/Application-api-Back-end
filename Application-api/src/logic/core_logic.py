@@ -1,7 +1,6 @@
 import time
 import psycopg2
-from app_in_bd import info_bd, is_board, is_card
-
+from logic.app_in_bd import info_bd, is_board, is_card
 
 
 class Estimation:
@@ -192,10 +191,3 @@ class Card:
                     return cursor.statusmessage
         else: 
             raise ErrorApi
-
-# a = Card
-# data = {'title': 'Paint', 'board': 'Доска дизайнера', 'status': 'ToDo', 'description': 'Необходимо за весь карантин не поехать кукухой ', 'assignee': 'Mark', 'estimation': '1m', 'user_name': 'Bob', 'times': 1586702775.722399}
-
-# a.create_from_dict(data)
-
-# print(a)

@@ -1,0 +1,8 @@
+{
+    "server":{"host": "127.0.0.1", 
+                "port": "5000"}, 
+    "Data_Base":{"dbname": "postgres", 
+                    "user": "ovsienko023", 
+                    "password": "68471325", 
+                    "host":"localhost"}
+}
