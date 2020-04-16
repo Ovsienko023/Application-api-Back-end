@@ -155,42 +155,7 @@ class Test_func_app_in_bd(unittest.TestCase):
     def test_delete_board(self):
         widget = delete_board('Доска Дизайнера 2', 'Bob')
         self.assertEqual(widget, 'DELETE 1')
-
-    # def test_is_board(self):
-    #     """ func is_board reverse """
-    #     widget = is_board('Доска Дизайнера 2')
-    #     print(widget, is_board('Доска Дизайнера 2'))
-    #     self.assertFalse(widget)
     
-    # def test_is_card(self):
-    #     """ func is_card reverse """
-    #     widget = is_card('Painter','Доска Дизайнера 2')
-    #     self.assertFalse(widget)
-    
-
-    
-
-    
-
-
-# from test_client import *
-
-# class FlaskrTestCase(unittest.TestCase):
-    
-#     def setUp(self):
-#         server.app.testing = True
-#         self.app = server.app.test_client()
-    
-#     def test_info(self):
-#         result = self.app.get('/api/v1/info')
-#         self.assertEqual(result.data, b'This is api gives access to the task management application')
-
-    # def tes_get_boards_list(self):
-    #     result = self.app.get('/api/v1/board/list')
-    #     print(result)
-    #     self.assertEqual(result.data, b'qwe' )
- 
-
     
 if __name__ == '__main__':
     unittest.main()
