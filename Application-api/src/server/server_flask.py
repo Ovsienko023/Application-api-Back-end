@@ -3,7 +3,7 @@ import sys
 sys.path.insert(0, 'Application-api/src')
 from server.server_in_app import client_wrapper
 from logic.app_in_bd import config_app
-
+""" This is v.2 add telegram bot """
 
 app = Flask(__name__)
 
