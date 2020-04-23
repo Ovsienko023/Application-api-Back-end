@@ -1,6 +1,15 @@
-import time
 import psycopg2
-from logic.app_in_bd import info_bd, is_board, is_card
+import json
+import time
+import os
+
+
+class ErrorApi(Exception):
+    pass
+
+
+class AuthenticationError(Exception):
+    pass
 
 
 class Estimation:
@@ -87,14 +96,6 @@ class Estimation:
             return str(obj) + 'h'
 
 
-class ErrorApi(Exception):
-    pass
-
-
-class AuthenticationError(Exception):
-    pass
-
-
 class Board:
     required = ['user_name', 'title', 'columns', ]
 
@@ -103,8 +104,6 @@ class Board:
         self.user_name = user_name
         self.title = title
         self.columns = self.valid_columns(columns)
-        self.board_id = int(str(hash(self.times))[:5])
-
 
     def valid_columns(self, columns):
         if isinstance(columns, list):
@@ -117,21 +116,6 @@ class Board:
     def create_from_dict(cls, data):
         parameters = [data[parameter] for parameter in cls.required]
         return cls(*parameters)
-
-
-    def save_in_bd(self):
-        if is_board(self.title):
-            
-            with psycopg2.connect(** info_bd) as conn:
-                with conn.cursor() as cursor:
-                    request = f"""INSERT INTO Boards (user_name, times, title, columns, board_id)
-                                VALUES ('{self.user_name}', '{self.times}',
-                                '{self.title}', '{self.columns}', {self.board_id})
-                    """
-                    cursor.execute(request)
-                    return cursor.statusmessage
-        else:
-            raise ErrorApi
 
 
 class Card:
@@ -148,7 +132,7 @@ class Card:
         self.description = description
         self.assignee = assignee
         self.estimation = self.pars_estimation(estimation)
-        self.board_id = self.get_board_id()
+        # self.board_id = self.get_board_id()
         self.last_update_at = time.time()
         self.last_update_by = user_name
 
@@ -164,30 +148,203 @@ class Card:
         obj = Estimation(estimation[:-1], estimation[-1:])
         return obj
 
-    def get_board_id(self):
-        try:
-            with psycopg2.connect(** info_bd) as conn:
-                with conn.cursor() as cursor:
-                    request = "SELECT board_id FROM Boards where title ='{}'".format(self.board)
-                    cursor.execute(request)
-                    records = cursor.fetchall()
-                    return records[0][0]
-        except IndexError:
-            raise ErrorApi
+
+class ConnectDB:
+    def __init__(self):
+        self.info_db = self.get_info_db()
+        self.conn = psycopg2.connect(** self.info_db)
+        self.cursor = self.conn.cursor()    
+
+    def config_app(self):
+        path = os.getcwd() + "/config.txt"
+        with open(path) as config:
+            json_str = config.read()
+            return json.loads(json_str)
+
+    def get_info_db(self):
+        info_db = self.config_app()['Data_Base']
+        return info_db
+       
+    def __del__(self):
+        self.conn.close()
+        self.cursor.close()
+
+
+class DataInDB:
+    cursor = ConnectDB().cursor
     
-    def save_in_bd(self):
-        if is_card(self.title, self.board):
-            with psycopg2.connect(** info_bd) as conn:
-                with conn.cursor() as cursor:
-                    request = f"""INSERT INTO Cards (user_name, times, title, board, status,
-                                                        description, assignee, estimation, board_id, 
-                                                        last_update_at, last_update_by)
-                                VALUES ('{self.user_name}', '{self.times}',
-                                '{self.title}', '{self.board}', '{self.status}',
-                                '{self.description}', '{self.assignee}', '{self.estimation}',
-                                {self.board_id}, '{self.last_update_at}', '{self.last_update_by}')
+    @classmethod
+    def get_users(cls):
+        users = {'users': []}
+
+        cls.cursor.execute('SELECT * FROM Users')
+        records = cls.cursor.fetchall()
+        for typles in records:
+            user_name, user_secret = typles
+            _ = dict()
+            _['user_name'] = user_name
+            _['user_secret'] = user_secret
+            users['users'].append(_)
+        return users
+    
+    @classmethod
+    def get_boards(cls):
+        boards = {'boards': []}
+
+        cls.cursor.execute('SELECT * FROM Boards')
+        records = cls.cursor.fetchall()
+        for typles in records:
+            user_name, times, title, columns = typles
+            _ = dict()
+            _['user_name'] = user_name
+            _['times'] = times
+            _['title'] = title
+            _['columns'] = columns.split(',')
+            boards['boards'].append(_)
+        return boards
+    
+    @classmethod
+    def get_cards(cls):
+        cards = {'cards': []}
+        
+        cls.cursor.execute('SELECT * FROM Cards')
+        records = cls.cursor.fetchall()
+        for typles in records:
+            user_name, times, title, board, status, description, assignee, estimation = typles
+            _ = dict()
+            _['user_name'] = user_name
+            _['times'] = times
+            _['title'] = title
+            _['board'] = board
+            _['status'] = status
+            _['description'] = description
+            _['assignee'] = assignee
+            _['estimation'] = estimation
+            cards['cards'].append(_)
+        return cards
+
+    @classmethod
+    def delete(cls, data, tabl_name):
+        title = data['title']
+        if tabl_name == 'board':
+            request = f"DELETE FROM Boards WHERE title = '{title}'"
+            cls.cursor.execute(request)   
+            return cls.cursor.statusmessage
+        if tabl_name == 'card':
+            board = data['board']
+            return cls.delete_card(title, board)
+
+    @classmethod
+    def get_card(cls, name_card, name_board):
+        try:
+            request = f""" SELECT user_name, times, title,
+                            board, status, description, assignee,
+                            estimation, last_update_at, last_update_by
+                            FROM Cards 
+                            where title = '{name_card}'
+                            AND board = '{name_board}'
                     """
-                    cursor.execute(request)
-                    return cursor.statusmessage
+            cls.cursor.execute(request)
+            records = cls.cursor.fetchall()
+            for typles in records:
+                (user_name, times, title, board,
+                status, description, assignee, estimation,
+                last_update_at, last_update_by) = typles
+                
+                card = dict()
+                card['user_name'] = user_name
+                card['times'] = times
+                card['title'] = title
+                card['board'] = board
+                card['status'] = status
+                card['description'] = description
+                card['assignee'] = assignee
+                card['estimation'] = estimation
+                card['last_update_at'] = last_update_at
+                card['last_update_by'] = last_update_by
+            cls.delete_card(title, board)
+            return card
+        except UnboundLocalError:
+            return ''
+
+    @classmethod
+    def delete_card(cls, title, board):
+        request = f"DELETE FROM Cards WHERE title = '{title}' and board = '{board}'"
+        cls.cursor.execute(request)
+        return cls.cursor.statusmessage
+
+    @classmethod
+    def delete_board(cls, title, user_name):
+        request = f"DELETE FROM Boards WHERE title = '{title}' and user_name = '{user_name}'"
+        cls.cursor.execute(request)
+        return cls.cursor.statusmessage
+
+    @classmethod
+    def is_board(cls, board_name):
+        """ func is_board reverse """
+        request = f"SELECT title FROM Boards where title = '{board_name}'"
+        cls.cursor.execute(request)
+        status = cls.cursor.statusmessage.split(' ')[1]
+        if status == '1':
+            return False
+        if status == '0': 
+            return True
+
+    @classmethod
+    def is_card(cls, card_name, board_name):
+        """ func is_card reverse """
+        request = f"SELECT title FROM Cards where title = '{card_name}' AND board = '{board_name}'"
+        cls.cursor.execute(request)
+        status = cls.cursor.statusmessage.split(' ')[1]
+        if status == '0':
+            return True
+        else: 
+            return False
+
+    @classmethod
+    def report(cls, data):
+        status = data['column']
+        name_board = data['board']
+        user = data['assignee']
+        request = f""" SELECT user_name, times, title,
+                            board, status, description, assignee,
+                            estimation, last_update_at, last_update_by
+                            FROM Cards 
+                            where assignee = '{user}'
+                            AND status = '{status}'
+                            AND board = '{name_board}'
+                    """
+        cls.cursor.execute(request)
+        records = cls.cursor.fetchall()
+        return records
+ 
+
+class SendObjDB:
+    def __init__(self, obj):
+        self.obj = obj
+        self.cursor = ConnectDB().cursor
+
+    def seve_board_in_db(self, obj):
+        if DataInDB.is_board(self.title):
+            request = f"""INSERT INTO Boards (user_name, times, title, columns)
+                        VALUES ('{self.obj.user_name}', '{self.obj.times}',
+                        '{self.obj.title}', '{self.obj.columns}')"""
+            self.cursor.execute(request)
+            return cursor.statusmessage
+        else:
+            raise ErrorApi
+
+    def save_card_in_bd(self, obj):
+        if DataInDB.is_card(self.title, self.board):
+            request = f"""INSERT INTO Cards (user_name, times, title, board, status,
+                                                description, assignee, estimation, 
+                                                last_update_at, last_update_by)
+                        VALUES ('{self.obj.user_name}', '{self.obj.times}',
+                        '{self.obj.title}', '{self.obj.board}', '{self.obj.status}',
+                        '{self.obj.description}', '{self.obj.assignee}', '{self.obj.estimation}',
+                        '{self.obj.last_update_at}', '{self.obj.last_update_by}')"""
+            self.cursor.execute(request)
+            return self.cursor.statusmessage
         else: 
             raise ErrorApi
+
