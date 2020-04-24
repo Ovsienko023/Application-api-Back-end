@@ -177,9 +177,39 @@ class ConnectDB:
         self.cursor.close()
 
 
+class SendObjDB:
+    def __init__(self, obj):
+        self.obj = obj
+        self.cursor = ConnectDB().cursor
+
+    def seve_board_in_db(self, obj):
+        if DataInDB.is_board(self.title):
+            request = f"""INSERT INTO Boards (user_name, times, title, columns)
+                        VALUES ('{self.obj.user_name}', '{self.obj.times}',
+                        '{self.obj.title}', '{self.obj.columns}')"""
+            self.cursor.execute(request)
+            return cursor.statusmessage
+        else:
+            raise ErrorApi
+
+    def save_card_in_bd(self, obj):
+        if DataInDB.is_card(self.title, self.board):
+            request = f"""INSERT INTO Cards (user_name, times, title, board, status,
+                                                description, assignee, estimation, 
+                                                last_update_at, last_update_by)
+                        VALUES ('{self.obj.user_name}', '{self.obj.times}',
+                        '{self.obj.title}', '{self.obj.board}', '{self.obj.status}',
+                        '{self.obj.description}', '{self.obj.assignee}', '{self.obj.estimation}',
+                        '{self.obj.last_update_at}', '{self.obj.last_update_by}')"""
+            self.cursor.execute(request)
+            return self.cursor.statusmessage
+        else: 
+            raise ErrorApi
+
+
 class DataInDB:
     cursor = ConnectDB().cursor
-    
+
     @classmethod
     def get_users(cls):
         users = {'users': []}
@@ -193,7 +223,7 @@ class DataInDB:
             _['user_secret'] = user_secret
             users['users'].append(_)
         return users
-    
+
     @classmethod
     def get_boards(cls):
         boards = {'boards': []}
@@ -326,40 +356,11 @@ class DataInDB:
         return records
  
 
-class SendObjDB:
-    def __init__(self, obj):
-        self.obj = obj
-        self.cursor = ConnectDB().cursor
-
-    def seve_board_in_db(self, obj):
-        if DataInDB.is_board(self.title):
-            request = f"""INSERT INTO Boards (user_name, times, title, columns)
-                        VALUES ('{self.obj.user_name}', '{self.obj.times}',
-                        '{self.obj.title}', '{self.obj.columns}')"""
-            self.cursor.execute(request)
-            return cursor.statusmessage
-        else:
-            raise ErrorApi
-
-    def save_card_in_bd(self, obj):
-        if DataInDB.is_card(self.title, self.board):
-            request = f"""INSERT INTO Cards (user_name, times, title, board, status,
-                                                description, assignee, estimation, 
-                                                last_update_at, last_update_by)
-                        VALUES ('{self.obj.user_name}', '{self.obj.times}',
-                        '{self.obj.title}', '{self.obj.board}', '{self.obj.status}',
-                        '{self.obj.description}', '{self.obj.assignee}', '{self.obj.estimation}',
-                        '{self.obj.last_update_at}', '{self.obj.last_update_by}')"""
-            self.cursor.execute(request)
-            return self.cursor.statusmessage
-        else: 
-            raise ErrorApi
-
 
 class DataInJson:
 
     @classmethod
-    def pars_for_rep(cls.lst_card):
+    def pars_for_rep(cls, lst_card):
         """ Method for parser in json """
         try:
             json_card = dict()
@@ -399,14 +400,6 @@ class DataInJson:
         except UnboundLocalError:
             raise ErrorApi
 
-    @classmethod
-    def crete_class(cls, data, clss, user_name):
-        data['user_name'] = user_name
-        data['times'] = time.time()
-        classes = {'board': Board, 'card': Card}
-        new_cls = classes[clss]
-        new_cls = new_cls.create_from_dict(data)
-        return new_cls
 
     @classmethod
     def update_card(cls, data, user_name):
@@ -441,3 +434,28 @@ class DataInJson:
                 raise ErrorApi
         obj.last_update_by = user_name
         return obj
+
+
+class ClientWrapper:
+    def __init__(self, user_name, user_secret, commands, data=None):
+        self.user_name = user_name
+        self.__user_secret = user_secret
+        self.authen = self.authentication(self.user_name, self.__user_secret)
+        self.commands = commands
+        self.data = data
+
+    def authentication(self, name_user, token):
+        for user in DataInDB.get_users()['users']:
+            if user.get('user_name') == name_user:
+                if user.get('user_secret') == token:
+                    return True
+        raise AuthenticationError
+
+    @classmethod
+    def crete_class(cls, data, clss, user_name):
+        data['user_name'] = user_name
+        data['times'] = time.time()
+        classes = {'board': Board, 'card': Card}
+        new_cls = classes[clss]
+        new_cls = new_cls.create_from_dict(data)
+        return new_cls
