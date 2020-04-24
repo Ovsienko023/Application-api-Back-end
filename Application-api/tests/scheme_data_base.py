@@ -1,7 +1,7 @@
 import psycopg2
 import sys
 sys.path.insert(0, 'Application-api/src')
-from logic.app_in_bd import info_bd
+#from logic.app_in_bd import info_bd
 
 
 def create_cards():

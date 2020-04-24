@@ -3,7 +3,7 @@ import sys
 sys.path.insert(0, 'Application-api/src')
 
 from logic.core_logic import Estimation, Board, Card
-from logic.app_in_bd import delete_card, delete_board, is_card, is_board, report
+#from logic.app_in_bd import delete_card, delete_board, is_card, is_board, report
        
 class TestEstimation(unittest.TestCase):
 

@@ -12,24 +12,29 @@ class AuthenticationError(Exception):
     pass
 
 
+class ConnectError(Exception):
+    pass
+
+
 class Estimation:
-    def __init__(self, num, cal):
-        self.pnum = num
-        self.cal = cal
+    def __init__(self, num_all):
+        self.num = num_all[:-1]
+        self.cal = num_all[-1]
         if self.cal == 'd':
-            self.num = int(num) * 8 
+            self.num = int(self.num) * 8 
         if self.cal == 'w':
-            self.num = int(num) * 40
+            self.num = int(self.num) * 40
         if self.cal == 'm':
-            self.num = int(num) * 160 
+            self.num = int(self.num) * 160 
         if self.cal == 'h':
-            self.num = int(num)
+            self.num = int(self.num)
         self.lst_obj = []
 
     
     def __add__(self, obj):
-        sum_str = self.num + obj.num 
-        return Estimation(sum_str, 'h')
+        sum_str = self.num + obj.num
+        sum_str = str(sum_str) + 'h'
+        return Estimation(sum_str)
    
         
     def pars(self):
@@ -46,7 +51,7 @@ class Estimation:
 
 
     def __repr__(self):
-        return str(self.pnum) + 'h'
+        return str(self.num) + 'h'
 
     
     def logic(self):
@@ -132,7 +137,6 @@ class Card:
         self.description = description
         self.assignee = assignee
         self.estimation = self.pars_estimation(estimation)
-        # self.board_id = self.get_board_id()
         self.last_update_at = time.time()
         self.last_update_by = user_name
 
@@ -152,8 +156,11 @@ class Card:
 class ConnectDB:
     def __init__(self):
         self.info_db = self.get_info_db()
-        self.conn = psycopg2.connect(** self.info_db)
-        self.cursor = self.conn.cursor()    
+        try:
+            self.conn = psycopg2.connect(** self.info_db)
+            self.cursor = self.conn.cursor()
+        except: 
+            raise ConnectError
 
     def config_app(self):
         path = os.getcwd() + "/config.txt"
@@ -164,8 +171,8 @@ class ConnectDB:
     def get_info_db(self):
         info_db = self.config_app()['Data_Base']
         return info_db
-       
-    def __del__(self):
+    
+    def close(self):
         self.conn.close()
         self.cursor.close()
 

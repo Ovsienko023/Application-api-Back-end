@@ -2,7 +2,7 @@ import json
 import time
 import os
 from logic.core_logic import Board, Card, Estimation, ErrorApi, AuthenticationError, config_app
-from logic.app_in_bd import get_users, get_card, get_boards, delete, report
+#from logic.app_in_bd import get_users, get_card, get_boards, delete, report
 
 
 def client_wrapper(user_name, user_secret, commands, data=None):
