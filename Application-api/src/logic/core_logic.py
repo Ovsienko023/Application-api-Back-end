@@ -155,13 +155,11 @@ class Card:
             raise ErrorApi
         
 
-class ConnectDB:
+class ConnectDB():
     def __init__(self):
         self.info_db = self.get_info_db()
-        try:
-            self.conn = psycopg2.connect(**self.info_db)
-        except: 
-            raise ConnectError
+        self.conn = psycopg2.connect(**self.info_db)
+        self.cur = self.conn.cursor()
 
     def config_app(self):
         path = os.getcwd() + "/config.txt"
@@ -172,17 +170,26 @@ class ConnectDB:
     def get_info_db(self):
         info_db = self.config_app()['Data_Base']
         return info_db
-    
+
+    def query(self, request):
+        self.cur.execute(request)
+        self.conn.commit()
+
+    def toyal(self):
+        return self.cur.fetchall()
+
+    def status(self):
+        return self.cur.statusmessage
+
     def close(self):
+        self.cur.close()
         self.conn.close()
-        self.cursor.close()
 
 
 class SendObjDB:
     def __init__(self, obj):
         self.obj = obj
-        self.conn = ConnectDB().conn
-        self.cursor = self.conn.cursor()
+        self.cursor = ConnectDB()
 
     def is_instance(self):
         if isinstance(self.obj, Board):
@@ -196,8 +203,8 @@ class SendObjDB:
     def is_board(self, board_name):
         """ func is_board reverse """
         request = f"SELECT title FROM Boards where title = '{board_name}'"
-        self.cursor.execute(request)
-        status = self.cursor.statusmessage.split(' ')[1]
+        self.cursor.query(request)
+        status = self.cursor.status().split(' ')[1]
         if status == '1':
             return False
         if status == '0': 
@@ -207,8 +214,8 @@ class SendObjDB:
     def is_card(self, card_name, board_name):
         """ func is_card reverse """
         request = f"SELECT title FROM Cards where title = '{card_name}' AND board = '{board_name}'"
-        self.cursor.execute(request)
-        status = self.cursor.statusmessage.split(' ')[1]
+        self.cursor.query(request)
+        status = self.cursor.status().split(' ')[1]
         if status == '0':
             return True
         else: 
@@ -219,10 +226,8 @@ class SendObjDB:
             request = f"""INSERT INTO Boards (user_name, times, title, columns)
                         VALUES ('{self.obj.user_name}', '{self.obj.times}',
                         '{self.obj.title}', '{self.obj.columns}')"""
-            self.cursor.execute(request)
-            print(self.cursor.statusmessage, '!!')
-            self.conn.commit()
-            return self.cursor.statusmessage
+            self.cursor.query(request)
+            return self.cursor.status()
         else:
             raise ErrorApi
 
@@ -235,23 +240,23 @@ class SendObjDB:
                         '{self.obj.title}', '{self.obj.board}', '{self.obj.status}',
                         '{self.obj.description}', '{self.obj.assignee}', '{self.obj.estimation}',
                         '{self.obj.last_update_at}', '{self.obj.last_update_by}')"""
-            self.cursor.execute(request)
-            self.conn.commit()
-            return self.cursor.statusmessage
+            self.cursor.query(request)
+            return self.cursor.status()
         else: 
             raise ErrorApi
-
+    
+    def __del__(self):
+        self.cursor.close()
 
 class DataInDB:
-    conn = ConnectDB().conn
-    cursor = conn.cursor()
+    cursor = ConnectDB()
 
     @classmethod
     def get_users(cls):
         users = {'users': []}
 
-        cls.cursor.execute('SELECT * FROM Users')
-        records = cls.cursor.fetchall()
+        cls.cursor.query('SELECT * FROM Users')
+        records = cls.cursor.toyal()
         for typles in records:
             user_name, user_secret = typles
             _ = dict()
@@ -264,8 +269,8 @@ class DataInDB:
     def get_boards(cls):
         boards = {'boards': []}
 
-        cls.cursor.execute('SELECT * FROM Boards')
-        records = cls.cursor.fetchall()
+        cls.cursor.query('SELECT * FROM Boards')
+        records = cls.cursor.toyal()
         for typles in records:
             user_name, times, title, columns = typles
             _ = dict()
@@ -280,8 +285,8 @@ class DataInDB:
     def get_cards(cls):
         cards = {'cards': []}
         
-        cls.cursor.execute('SELECT * FROM Cards')
-        records = cls.cursor.fetchall()
+        cls.cursor.query('SELECT * FROM Cards')
+        records = cls.cursor.toyal()
         for typles in records:
             user_name, times, title, board, status, description, assignee, estimation = typles
             _ = dict()
@@ -301,9 +306,8 @@ class DataInDB:
         title = data['title']
         if tabl_name == 'board':
             request = f"DELETE FROM Boards WHERE title = '{title}'"
-            cls.cursor.execute(request)
-            cls.conn.commit()   
-            return cls.cursor.statusmessage
+            cls.cursor.query(request) 
+            return cls.cursor.status()
         if tabl_name == 'card':
             board = data['board']
             return cls.delete_card(title, board)
@@ -318,8 +322,8 @@ class DataInDB:
                             where title = '{name_card}'
                             AND board = '{name_board}'
                     """
-            cls.cursor.execute(request)
-            records = cls.cursor.fetchall()
+            cls.cursor.query(request)
+            records = cls.cursor.toyal()
             for typles in records:
                 (user_name, times, title, board,
                 status, description, assignee, estimation,
@@ -344,15 +348,14 @@ class DataInDB:
     @classmethod
     def delete_card(cls, title, board):
         request = f"DELETE FROM Cards WHERE title = '{title}' and board = '{board}'"
-        cls.cursor.execute(request)
-        cls.conn.commit() 
-        return cls.cursor.statusmessage
+        cls.cursor.query(request)
+        return cls.cursor.status()
     #!!!! Not use
     @classmethod
     def delete_board(cls, title, user_name):
         request = f"DELETE FROM Boards WHERE title = '{title}' and user_name = '{user_name}'"
-        cls.cursor.execute(request)
-        return cls.cursor.statusmessage
+        cls.cursor.query(request)
+        return cls.cursor.status()
 
     @classmethod
     def report(cls, data):
@@ -368,9 +371,8 @@ class DataInDB:
                             AND status = '{status}'
                             AND board = '{name_board}'
                     """
-        cls.cursor.execute(request)
-        records = cls.cursor.fetchall()
-        return records
+        cls.cursor.query(request)
+        return cls.cursor.toyal()
  
 
 class DataInJson:
@@ -508,3 +510,5 @@ class ClientWrapper:
             status = DataInDB.get_boards()
             return status
     
+        # def __del__(self):
+        #     DataInDB.cursor.close()
