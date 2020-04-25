@@ -18,9 +18,7 @@ class ConnectError(Exception):
 
 class Estimation:
     def __init__(self, num_all):
-        print(num_all)
         self.num = num_all[:-1]
-        print(self.num, type(self.num))
         self.cal = num_all[-1]
         if self.cal == 'd':
             self.num = int(self.num) * 8 
@@ -121,7 +119,6 @@ class Board:
 
     @classmethod
     def create_from_dict(cls, data):
-        print('Board_create_obj')
         parameters = [data[parameter] for parameter in cls.required]
         return cls(*parameters)
 
@@ -145,11 +142,8 @@ class Card:
 
     @classmethod
     def create_from_dict(cls, data):
-        print('!!!! create')
         try:
             parameters = [data[parameter] for parameter in cls.required]
-            print(parameters)
-            print(cls(*parameters))
             return cls(*parameters)
         except TypeError:
             raise ErrorApi
@@ -247,6 +241,7 @@ class SendObjDB:
     
     def __del__(self):
         self.cursor.close()
+
 
 class DataInDB:
     cursor = ConnectDB()
@@ -359,7 +354,6 @@ class DataInDB:
 
     @classmethod
     def report(cls, data):
-        print(data, '----data')
         status = data['column']
         name_board = data['board']
         user = data['assignee']
@@ -373,7 +367,7 @@ class DataInDB:
                     """
         cls.cursor.query(request)
         return cls.cursor.toyal()
- 
+
 
 class DataInJson:
     @classmethod
@@ -383,7 +377,6 @@ class DataInJson:
             json_card = dict()
             sum_estimation = list()
             lst = list()
-            print(len(lst_card), '!!!!!')
             for card in lst_card:
                 (user_name, times, title, board,
                 status, description, assignee, estimation,
@@ -474,9 +467,7 @@ class ClientWrapper:
         data['times'] = time.time()
         classes = {'board': Board, 'card': Card}
         new_cls = classes[clss]
-        print(new_cls, 'new class')
         new_cls = new_cls.create_from_dict(data)
-        print(new_cls, 'new class')
         return new_cls
 
     def command_define(self):
@@ -486,15 +477,11 @@ class ClientWrapper:
             return DataInJson.pars_for_rep(lst_report)
 
         if command == 'create':
-            print('Create_board','!')
             obj = ClientWrapper.crete_class(self.data, clss, self.user_name)
-            print('!!')
             status = SendObjDB(obj).is_instance()
-            print(status, '!!!')
             return status
         #!!!
         if command == 'delete':
-            print(clss)
             status = str(DataInDB.delete(self.data, clss))
             return status
         
@@ -509,6 +496,3 @@ class ClientWrapper:
         if self.commands == 'board_list':
             status = DataInDB.get_boards()
             return status
-    
-        # def __del__(self):
-        #     DataInDB.cursor.close()
