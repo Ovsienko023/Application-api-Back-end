@@ -1,8 +1,9 @@
 import psycopg2
 import sys
 sys.path.insert(0, 'Application-api/src')
-#from logic.app_in_bd import info_bd
+from logic.core_logic import ConnectDB
 
+info_bd = ConnectDB().config_app()['Data_Base']
 
 def create_cards():
     with psycopg2.connect(**info_bd) as conn:

@@ -32,7 +32,7 @@ def delete_card():
     url = r'http://127.0.0.1:5000/api/v1/card/delete'
     headers = {'UserName': 'Bob', 'UserSecret':'123'}
     data = {
-        "title": "Painter_",
+        "title": "Painter",
         "board": "Доска Дворника 2"
     }
 
@@ -44,10 +44,10 @@ def create_card():
     url = r'http://127.0.0.1:5000/api/v1/card/create'
     headers = {'UserName': 'Bob', 'UserSecret':'123'}
     data = {
-        "title": "Painter_",
+        "title": "Painter",
         "board": "Доска Дворника 2",
         "status": "Пойти",
-        "description": "Необходимо за весь карантин не поехать кукухой ",
+        "description": "Необходимо за весь карантин не поехать кукухой",
         "assignee": "Mark",
         "estimation": "1m"
     }
@@ -59,7 +59,7 @@ def update_card():
     url = r'http://127.0.0.1:5000/api/v1/card/update'
     headers = {'UserName': 'Bob', 'UserSecret':'123'}
     data = {
-        "title": "Painter_",
+        "title": "Painter",
         "board": "Доска Дворника 2",
         "assignee": "Karlos"
     }
@@ -96,7 +96,7 @@ def main():
     board_list()
     create_card()
     update_card()
-
+ 
     report()
 
     delete_card()
