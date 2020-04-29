@@ -5,7 +5,7 @@ sys.path.insert(0, 'Application-api/src')
 
 from logic.core_logic import ClientWrapper, ConnectDB
 from server_in_app import main
-from bot import main_bot
+
 
 app = Flask(__name__)
 
@@ -136,15 +136,6 @@ def report():
     command = 'cards_report'
     return post_request(command)
 
-
-@app.route("/", methods=["GET", "POST"])
-def telegram():
-    """ For Telegramm bot """
-    main_bot(request)
-    # chat_id = request.json['message']['chat']['id']
-    # last_name = request.json['message']['chat']['last_name']
-    # send_message(chat_id, last_name)
-    return {"ok": True}
 
 info_server = ConnectDB().config_app()['server']
 app.run(**info_server)
