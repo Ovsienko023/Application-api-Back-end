@@ -1,8 +1,9 @@
 import psycopg2
 import sys
 sys.path.insert(0, 'Application-api/src')
-from logic.app_in_bd import info_bd
+from logic.core_logic import ConnectDB
 
+info_bd = ConnectDB().config_app()['Data_Base']
 
 def create_cards():
     with psycopg2.connect(**info_bd) as conn:
@@ -17,7 +18,6 @@ def create_cards():
                 description CHARACTER VARYING(150),
                 assignee CHARACTER VARYING(50),
                 estimation CHARACTER VARYING(10),
-                board_id INTEGER,
                 last_update_at CHARACTER VARYING(50),
                 last_update_by CHARACTER VARYING(50)
             )"""
@@ -32,9 +32,7 @@ def create_boards():
                 user_name CHARACTER VARYING(30),
                 times CHARACTER VARYING(30),
                 title CHARACTER VARYING(50),
-                columns CHARACTER VARYING(100),
-                board_id INTEGER
-                
+                columns CHARACTER VARYING(100)
                 )"""
             cursor.execute(req)
             records = cursor

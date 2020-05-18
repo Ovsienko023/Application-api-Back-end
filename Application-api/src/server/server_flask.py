@@ -1,11 +1,13 @@
 from flask import Flask, request
 import sys
 sys.path.insert(0, 'Application-api/src')
-from server.server_in_app import client_wrapper
-from logic.app_in_bd import config_app
+""" This is v.2 add telegram bot """
+from logic.core_logic import ClientWrapper, ConnectDB
+from server_in_app import main
 
 
 app = Flask(__name__)
+
 
 def post_request(command):
     data = request.json
@@ -13,8 +15,8 @@ def post_request(command):
     user_name = headers['UserName']
     user_secret =  headers['UserSecret']
 
-    answer = client_wrapper(user_name, user_secret, command, data=data)
-
+    obj_answer = ClientWrapper(user_name, user_secret, command, data=data)
+    answer = main(obj_answer)
     if answer == "Error" or answer == 'DELETE 0' or answer == '':
         return {"Error": "Value"}
 
@@ -25,15 +27,15 @@ def post_request(command):
         return answer
     
 
-
 def get_request(command):
     headers = request.headers
     user_name = headers['UserName']
     user_secret =  headers['UserSecret']
-
-    answer = client_wrapper(user_name, user_secret, command)
+    print('!')
+    obj_answer = ClientWrapper(user_name, user_secret, command)
+    print(obj_answer)
+    answer = main(obj_answer)
     return answer
-
 
 
 @app.route('/api/v1/user/list')
@@ -133,5 +135,5 @@ def report():
     return post_request(command)
 
 
-info_server = config_app()['server']
+info_server = ConnectDB().config_app()['server']
 app.run(**info_server)
