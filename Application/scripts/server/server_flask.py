@@ -1,17 +1,12 @@
 from flask import Flask, request
 from functools import wraps
 import sys
-from scripts.logic.core_logic import ClientWrapper,ErrorApi, AuthenticationError
+from scripts.logic.core_logic import Destributor, ErrorApi
 
 app = Flask(__name__)
 
 
 def main(obj_client):
-    try:
-        obj_client.authen
-    except AuthenticationError:
-        return 'Authentication Error'
-
     try:
         status = obj_client.command_define()
         print(status)
@@ -22,11 +17,8 @@ def main(obj_client):
 
 def post_request(command):
     data = request.json
-    headers = request.headers
-    user_name = headers['UserName']
-    user_secret =  headers['UserSecret']
-
-    obj_answer = ClientWrapper(user_name, user_secret, command, data=data)
+    user_name = request.authorization['username']
+    obj_answer = Destributor(user_name, data=data)
     answer = main(obj_answer)
     if answer == "Error" or answer == 'DELETE 0' or answer == '':
         return {"Error": "Value"}
@@ -38,15 +30,12 @@ def post_request(command):
         return answer
     
 
-def get_request(command):
-    headers = request.headers
-    user_name = headers['UserName']
-    user_secret =  headers['UserSecret']
-    print('!')
-    obj_answer = ClientWrapper(user_name, user_secret, command)
-    print(obj_answer)
-    answer = main(obj_answer)
-    return answer
+# def get_request(command):
+#     user_name, _ = request.authorization
+#     obj_answer = Destributor(user_name, command)
+#     print(obj_answer)
+#     answer = main(obj_answer)
+#     return answer
 
 
 def authorization(func):
@@ -54,22 +43,23 @@ def authorization(func):
     def wrapper():
         a = func()
         data = request.authorization
-        print(data)
+        # print(data)
         if data['username'] == 'Bob':
             return a
-        return {"status": "error"}
+        return {"status": "error", "info": "Authentication Error"}
     return wrapper
 
-
-
+#+++
 @app.route('/api/v1/user/list',  methods=['GET'])
 @authorization
 def user_list():
     """ GET all user """
+    user_name = request.authorization['username']
+    status = Destributor(user_name).user_list()
+    return status
 
-    return ''
 
-
+# +++
 @app.route('/api/v1/board/create', methods=['POST'])
 @authorization
 def board_creat():
@@ -80,8 +70,10 @@ def board_creat():
     }
     response: {"ok": true}
     """
-
-    return ''
+    data = request.json
+    user_name = request.authorization['username']
+    status = Destributor(user_name, data=data).board_creat()
+    return status
 
 
 @app.route('/api/v1/board/delete', methods=['DELETE'])
@@ -90,16 +82,18 @@ def board_delete():
     """
     {"title": "Доска разработчика"}
     """
-
+    # data = request.data
+    print(request.json)
     return ''
 
-
+# +++
 @app.route('/api/v1/board/list',  methods=['GET'])
 @authorization
 def board_list():
     """ GET all board """
-
-    return ''
+    user_name = request.authorization['username']
+    status = Destributor(user_name).board_list()
+    return status
 
 
 @app.route('/api/v1/card/create', methods=['POST'])

@@ -2,7 +2,7 @@
     "server":{"host": "127.0.0.1", 
                 "port": "5000"}, 
     "Data_Base":{"dbname": "my_data_base", 
-                    "user": "ovsienko023", 
+                    "user": "postgres", 
                     "password": "68471325", 
                     "host":"localhost"}
 }

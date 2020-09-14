@@ -1,9 +1,14 @@
+# from logger.log import MyLogging
 import psycopg2
 import time
 import json
 import os
 
 
+# super_logger = MyLogging().setup_logger('core_logic',
+                                        # 'Application/logger/logfile.log')
+#super_logger.error('Error', exc_info=True)
+#super_logger.info()!!!!!!! читать
 class ErrorApi(Exception):
     pass
 
@@ -119,6 +124,7 @@ class Board:
 
     @classmethod
     def create_from_dict(cls, data):
+        print(data)
         parameters = [data[parameter] for parameter in cls.required]
         return cls(*parameters)
 
@@ -184,7 +190,7 @@ class SendObjDB:
     def __init__(self, obj):
         self.obj = obj
         self.cursor = ConnectDB()
-
+# Возможно не нужно!
     def is_instance(self):
         if isinstance(self.obj, Board):
             status = self.save_board_in_db()
@@ -446,20 +452,10 @@ class DataInJson:
         return obj
 
 
-class ClientWrapper:
-    def __init__(self, user_name, user_secret, commands, data=None):
+class Destributor:  #ClientWrapper
+    def __init__(self, user_name, data=None):
         self.user_name = user_name
-        self.user_secret = user_secret
-        self.authen = self.authentication()
-        self.commands = commands
         self.data = data
-
-    def authentication(self):
-        for user in DataInDB.get_users()['users']:
-            if user.get('user_name') == self.user_name:
-                if user.get('user_secret') == self.user_secret:
-                    return True
-        raise AuthenticationError
 
     @classmethod
     def crete_class(cls, data, clss, user_name):
@@ -477,10 +473,10 @@ class ClientWrapper:
             return DataInJson.pars_for_rep(lst_report)
 
         if command == 'create':
-            obj = ClientWrapper.crete_class(self.data, clss, self.user_name)
+            obj = Destributor.crete_class(self.data, clss, self.user_name)
             status = SendObjDB(obj).is_instance()
             return status
-        #!!!
+
         if command == 'delete':
             status = str(DataInDB.delete(self.data, clss))
             return status
@@ -489,10 +485,41 @@ class ClientWrapper:
             status = DataInJson.update_card(self.data, self.user_name)
             return status
 
-        if self.commands == 'user_list':
-            return {"count" :len(DataInDB.get_users()['users']), 
-                        "users": [{'username':i['user_name']} for i in DataInDB.get_users()['users']] }
+        # if self.commands == 'user_list':
+            # return {"count" :len(DataInDB.get_users()['users']), 
+            #             "users": [{'username':i['user_name']} for i in DataInDB.get_users()['users']] }
         
-        if self.commands == 'board_list':
-            status = DataInDB.get_boards()
+        # if commands == 'board_list':
+        #     status = DataInDB.get_boards()
+        #     return status
+
+    def user_list(self):
+        try: 
+            status = {"count" :len(DataInDB.get_users()['users']), 
+                            "users": [{'username':i['user_name']} for i in DataInDB.get_users()['users']] }
             return status
+        except ErrorApi:
+            return 'ErrorApi'
+    
+    def board_list(self):
+        status = DataInDB.get_boards()
+        return status
+
+    def board_creat(self):
+        try:
+            self.data['user_name'] = self.user_name
+            self.data['times'] = time.time()
+            obj_board = Board.create_from_dict(self.data)
+            answer = SendObjDB(obj_board).save_board_in_db()
+
+            if answer == "Error" or answer == 'DELETE 0' or answer == '':
+                return {"Error": "Value"}
+            if answer == 'ok' or answer == 'INSERT 0 1' or answer == 'DELETE 1':
+                return {"ok":True}
+            if answer:
+                return answer
+        except ErrorApi:
+            return 'ErrorApi'
+
+
+    

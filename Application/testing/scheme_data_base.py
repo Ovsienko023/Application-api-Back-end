@@ -1,6 +1,6 @@
 import psycopg2
 import sys
-sys.path.insert(0, 'Application-api/src')
+sys.path.insert(0, 'Application/scripts')
 from logic.core_logic import ConnectDB
 
 info_bd = ConnectDB().config_app()['Data_Base']
