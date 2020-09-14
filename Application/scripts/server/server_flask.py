@@ -1,9 +1,6 @@
 from flask import Flask, request
+from functools import wraps
 import sys
-# sys.path.insert(0, 'Application-api/src')
-# """ This is v.2 add telegram bot """
-# from logic.core_logic import ClientWrapper, ConnectDB
-# from server_in_app import main
 from scripts.logic.core_logic import ClientWrapper,ErrorApi, AuthenticationError
 
 app = Flask(__name__)
@@ -52,15 +49,29 @@ def get_request(command):
     return answer
 
 
-@app.route('/api/v1/user/list')
+def authorization(func):
+    @wraps(func)
+    def wrapper():
+        a = func()
+        data = request.authorization
+        print(data)
+        if data['username'] == 'Bob':
+            return a
+        return {"status": "error"}
+    return wrapper
+
+
+
+@app.route('/api/v1/user/list',  methods=['GET'])
+@authorization
 def user_list():
     """ GET all user """
 
-    command = 'user_list'
-    return get_request(command)
+    return ''
 
 
 @app.route('/api/v1/board/create', methods=['POST'])
+@authorization
 def board_creat():
     """
     request: {
@@ -69,29 +80,30 @@ def board_creat():
     }
     response: {"ok": true}
     """
-    command = 'board_create'
-    return post_request(command)
+
+    return ''
 
 
-@app.route('/api/v1/board/delete', methods=['POST'])
+@app.route('/api/v1/board/delete', methods=['DELETE'])
+@authorization
 def board_delete():
     """
     {"title": "Доска разработчика"}
     """
 
-    command = 'board_delete'
-    return post_request(command)
+    return ''
 
 
-@app.route('/api/v1/board/list')
+@app.route('/api/v1/board/list',  methods=['GET'])
+@authorization
 def board_list():
     """ GET all board """
 
-    command = 'board_list'
-    return get_request(command)
+    return ''
 
 
 @app.route('/api/v1/card/create', methods=['POST'])
+@authorization
 def card_create():
     """
     {
@@ -104,11 +116,11 @@ def card_create():
     }
     """
 
-    command = 'card_create'
-    return post_request(command)
+    return ''
 
 
-@app.route('/api/v1/card/update', methods=['POST'])
+@app.route('/api/v1/card/update', methods=['PUT'])
+@authorization
 def card_update():
     """
     {
@@ -118,11 +130,11 @@ def card_update():
     }
     """
 
-    command = 'card_update'
-    return post_request(command)
+    return ''
 
 
-@app.route('/api/v1/card/delete', methods=['POST'])
+@app.route('/api/v1/card/delete', methods=['DELETE'])
+@authorization
 def card_delete():
     """
     {
@@ -131,11 +143,11 @@ def card_delete():
     }
     """
 
-    command = 'card_delete'
-    return post_request(command)
+    return ''
 
 
-@app.route('/api/v1/report/cards_by_column', methods=['POST'])
+@app.route('/api/v1/report/cards_by_column', methods=['GET'])
+@authorization
 def report():
     """ 
     {
@@ -145,5 +157,4 @@ def report():
     }
     """
 
-    command = 'cards_report'
-    return post_request(command)
+    return ''
