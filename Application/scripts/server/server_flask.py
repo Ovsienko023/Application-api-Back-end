@@ -1,12 +1,26 @@
 from flask import Flask, request
 import sys
-sys.path.insert(0, 'Application-api/src')
-""" This is v.2 add telegram bot """
-from logic.core_logic import ClientWrapper, ConnectDB
-from server_in_app import main
-
+# sys.path.insert(0, 'Application-api/src')
+# """ This is v.2 add telegram bot """
+# from logic.core_logic import ClientWrapper, ConnectDB
+# from server_in_app import main
+from scripts.logic.core_logic import ClientWrapper,ErrorApi, AuthenticationError
 
 app = Flask(__name__)
+
+
+def main(obj_client):
+    try:
+        obj_client.authen
+    except AuthenticationError:
+        return 'Authentication Error'
+
+    try:
+        status = obj_client.command_define()
+        print(status)
+        return status   
+    except ErrorApi:
+        return ''
 
 
 def post_request(command):
@@ -133,7 +147,3 @@ def report():
 
     command = 'cards_report'
     return post_request(command)
-
-
-info_server = ConnectDB().config_app()['server']
-app.run(**info_server)

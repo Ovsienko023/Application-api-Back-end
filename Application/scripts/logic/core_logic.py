@@ -156,7 +156,7 @@ class ConnectDB():
         self.cur = self.conn.cursor()
 
     def config_app(self):
-        path = os.getcwd() + "/config.txt"
+        path = os.getcwd() + "/Application/config.json"
         with open(path) as config:
             json_str = config.read()
             return json.loads(json_str)
