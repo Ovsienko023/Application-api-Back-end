@@ -1,12 +1,14 @@
-# from logger.log import MyLogging
 import psycopg2
 import time
 import json
 import os
+from logger.log import MyLogging
+import logging
 
-
-# super_logger = MyLogging().setup_logger('core_logic',
-                                        # 'Application/logger/logfile.log')
+super_logger = MyLogging().setup_logger('core_logic',
+                                        'Application/logger/logfile.log')#, logging.INFO)
+# super_logger_err = MyLogging().setup_logger('core_logic',
+#                                         'Application/logger/logfile_err.log', logging.ERROR)
 #super_logger.error('Error', exc_info=True)
 #super_logger.info()!!!!!!! читать
 class ErrorApi(Exception):
@@ -156,6 +158,7 @@ class Card:
         
 
 class ConnectDB():
+    """Creating a connection to the database."""
     def __init__(self):
         self.info_db = self.get_info_db()
         self.conn = psycopg2.connect(**self.info_db)
@@ -187,19 +190,11 @@ class ConnectDB():
 
 
 class SendObjDB:
+    """Sending objects to the database."""
     def __init__(self, obj):
         self.obj = obj
         self.cursor = ConnectDB()
-# Возможно не нужно!
-    # def is_instance(self):
-    #     if isinstance(self.obj, Board):
-    #         status = self.save_board_in_db()
-    #         return status
-    #     if isinstance(self.obj, Card):
-    #         status = self.save_card_in_bd()
-    #         return status
 
-    
     def is_board(self, board_name):
         """ func is_board reverse """
         request = f"SELECT title FROM Boards where title = '{board_name}'"
@@ -250,13 +245,14 @@ class SendObjDB:
 
 
 class DataInDB:
+    """Writing data to the database."""
     cursor = ConnectDB()
 
     @classmethod
     def get_users(cls):
         users = {'users': []}
 
-        cls.cursor.query('SELECT * FROM Users')
+        cls.cursor.query('SELECT user_name, user_secret FROM Users')
         records = cls.cursor.toyal()
         for typles in records:
             user_name, user_secret = typles
@@ -302,16 +298,16 @@ class DataInDB:
             cards['cards'].append(_)
         return cards
 
-    @classmethod
-    def delete(cls, data, tabl_name):
-        title = data['title']
-        if tabl_name == 'board':
-            request = f"DELETE FROM Boards WHERE title = '{title}'"
-            cls.cursor.query(request) 
-            return cls.cursor.status()
-        if tabl_name == 'card':
-            board = data['board']
-            return cls.delete_card(title, board)
+    # @classmethod
+    # def delete(cls, data, tabl_name):
+    #     title = data['title']
+    #     if tabl_name == 'board':
+    #         request = f"DELETE FROM Boards WHERE title = '{title}'"
+    #         cls.cursor.query(request) 
+    #         return cls.cursor.status()
+    #     if tabl_name == 'card':
+    #         board = data['board']
+    #         return cls.delete_card(title, board)
 
     @classmethod
     def get_card(cls, name_card, name_board):
@@ -351,7 +347,7 @@ class DataInDB:
         request = f"DELETE FROM Cards WHERE title = '{title}' and board = '{board}'"
         cls.cursor.query(request)
         return cls.cursor.status()
-    #!!!! Not use
+
     @classmethod
     def delete_board(cls, title, user_name):
         request = f"DELETE FROM Boards WHERE title = '{title}' and user_name = '{user_name}'"
@@ -374,8 +370,15 @@ class DataInDB:
         cls.cursor.query(request)
         return cls.cursor.toyal()
 
+    @classmethod
+    def is_authentication(cls, user_name, user_secret):
+        request = f""" SELECT user_name, user_secret FROM Users 
+                        WHERE user_name = '{user_name}'"""
+        cls.cursor.query(request)
+        return cls.cursor.toyal()
 
 class DataInJson:
+    """Methods for converting data from db to json."""
     @classmethod
     def pars_for_rep(cls, lst_card):
         """ Method for parser in json """
@@ -415,7 +418,6 @@ class DataInJson:
             return json_card
         except UnboundLocalError:
             raise ErrorApi
-
 
     @classmethod
     def update_card(cls, data, user_name):
@@ -459,10 +461,13 @@ class Destributor:
 
     def user_list(self):
         try: 
-            status = {"count" :len(DataInDB.get_users()['users']), 
-                            "users": [{'username':i['user_name']} for i in DataInDB.get_users()['users']] }
+            list_user = DataInDB.get_users()['users']
+            count = len(list_user)
+            status = {"count" :count, 
+                            "users": [{'username':i['user_name']} for i in list_user] }
             return status
         except ErrorApi:
+            super_logger.error(f"user: {self.user_name}, user_list")
             return {"status": False, "info": "ErrorApi"}
     
     def board_list(self):
@@ -487,6 +492,7 @@ class Destributor:
             answer = self.response_handler(answer)
             return answer
         except ErrorApi:
+            super_logger.error(f"user: {self.user_name}, board_creat")
             return {"status": False, "Error": "Value"}
 
     def board_delete(self):
@@ -495,6 +501,7 @@ class Destributor:
             answer = self.response_handler(answer)
             return answer
         except ErrorApi:
+            super_logger.error(f"user: {self.user_name}, board_delete")
             return {"status": False, "Error": "Value"}
 
     def card_create(self):
@@ -506,6 +513,7 @@ class Destributor:
             answer = self.response_handler(answer)
             return answer
         except ErrorApi:
+            super_logger.error(f"user: {self.user_name}, card_create")
             return {"status": False, "Error": "Value"}
     
     def card_update(self):
@@ -514,6 +522,7 @@ class Destributor:
             answer = self.response_handler(answer)
             return answer
         except ErrorApi:
+            super_logger.error(f"user: {self.user_name}, card_update")
             return {"status": False, "Error": "Value"}
     
     def card_delete(self):
@@ -524,6 +533,7 @@ class Destributor:
             answer = self.response_handler(answer)
             return answer
         except ErrorApi:
+            super_logger.error(f"user: {self.user_name}, card_delete")
             return {"status": False, "Error": "Value"}
 
     def report(self):
@@ -532,4 +542,5 @@ class Destributor:
             print(lst_report)
             return DataInJson.pars_for_rep(lst_report)
         except ErrorApi:
+            super_logger.error(f"user: {self.user_name}, report")
             return {"status": False, "Error": "Value"}

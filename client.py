@@ -1,10 +1,11 @@
 
 import requests
-
+from werkzeug.security import generate_password_hash
+from werkzeug.security import check_password_hash
 
 login = 'Bob'
 passsword = '123'
-
+hash_ = generate_password_hash(passsword) # Для записи пользователя
 def user_list():
     url = r'http://127.0.0.1:5000/api/v1/user/list'
     response = requests.get(url, auth=(login, passsword))
@@ -92,7 +93,7 @@ def board_list():
 # user_list()
 # board_list()
 # create_board()
-# delete_board()
+delete_board()
 # create_card()
 # update_card()
 # delete_card()

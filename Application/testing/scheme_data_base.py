@@ -43,7 +43,7 @@ def create_users():
             req = """CREATE TABLE Users
             (
                 user_name CHARACTER VARYING(30),
-                user_secret CHARACTER VARYING(30)
+                user_secret CHARACTER VARYING(100)
                 
             )"""
             cursor.execute(req)
@@ -54,7 +54,7 @@ def app_users():
     with psycopg2.connect(**info_bd) as conn:
         with conn.cursor() as cursor:
             req = """INSERT INTO Users (user_name, user_secret)
-                VALUES ('Bob', '123')"""
+                VALUES ('Bob', 'pbkdf2:sha256:150000$3aAjZE66$9d20239bfc3bfd00b02257fa58f0e8068015e835479ea9292cc25ea832cffac5')"""
             cursor.execute(req)
             records = cursor
 

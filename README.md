@@ -6,7 +6,7 @@
 * На все удачные запросы возвращается json c данным или {"ok":True}. 
 
 * В случае неудачи: {"Error": "Value"} 
-* В случае ошибки идентификации: Authentication Error
+* В случае ошибки идентификации: {"status": False, "info": "Authentication Error"}
 
 ## Для начала работы с api необходимо:
 
@@ -33,92 +33,92 @@
 ## Начало работы с api
 Примеры работы:
 
-Bob - пользователь для теста api
+Пользователь для теста api:
+login = Bob
+passsword = 123
 
 Все примеры написанны на python3 c использованием модуля requests
 
 #### Создание доски:
 
-	def create_board():
-	    url = r'http://127.0.0.1:5000/api/v1/board/create'
-	    headers = {'UserName': 'Bob', 'UserSecret':'123'}
-	    data = {
-	        "title": "Доска Дворника 2",
-	        "columns": [
-	            "Пойти",
-	            "Убрать",
-	            "Уйти"
-	    ] }
+   def create_board():
+       url = r'http://127.0.0.1:5000/api/v1/board/create'
+       data = {
+           "title": "Доска Дворника 1",
+           "columns": [
+               "Пойти",
+               "Убрать",
+               "Уйти"
+       ] }
+       response = requests.post(url, json=data, auth=(login, passsword))
+       print(response.content)
 
-	    response = requests.post(url, json=data, headers=headers)
-	    print(response.content)
 #### Удаление доски
 
-	def delete_board():
-	    url = r'http://127.0.0.1:5000/api/v1/board/delete'
-	    headers = {'UserName': 'Bob', 'UserSecret':'123'}
-	    data = {
-	        "title": "Доска Дворника 2",
-	    }
+   def delete_board():
+       url = r'http://127.0.0.1:5000/api/v1/board/delete'
+       data = {
+           "title": "Доска Дворника 1",
+       }
 
-	    response = requests.post(url, json=data, headers=headers)
-	    print(response.content)
+       response = requests.delete(url, params=data, auth=(login, passsword))
+       print(response.json())
 
 #### Создание Карточки
 
-	def create_card():
-	    url = r'http://127.0.0.1:5000/api/v1/card/create'
-	    headers = {'UserName': 'Bob', 'UserSecret':'123'}
-	    data = {
-	        "title": "Painter_",
-	        "board": "Доска Дворника 2",
-	        "status": "Пойти",
-	        "description": "Необходимо за весь карантин не поехать кукухой ",
-	        "assignee": "Mark",
-	        "estimation": "1m"
-	    }
-	    response = requests.post(url, json=data, headers=headers)
-	    print(response.content)
+   def create_card():
+       url = r'http://127.0.0.1:5000/api/v1/card/create'
+       data = {
+           "title": "Painter_",
+           "board": "Доска Дворника 1",
+           "status": "Пойти",
+           "description": "Необходимо за весь карантин не поехать кукухой ",
+           "assignee": "Mark",
+           "estimation": "1m"
+       }
+       response = requests.post(url, json=data, auth=(login, passsword))
+       print(response.json())
+
 #### Обновление Карточки
-	def update_card():
-	    url = r'http://127.0.0.1:5000/api/v1/card/update'
-	    headers = {'UserName': 'Bob', 'UserSecret':'123'}
-	    data = {
-	        "title": "Painter_",
-	        "board": "Доска Дворника 2",
-	        "assignee": "Karlos"
-	    }
 
-	    response = requests.post(url, json=data, headers=headers)
-	    print(response.content)
+   def update_card():
+       url = r'http://127.0.0.1:5000/api/v1/card/update'
+       data = {
+           "title": "Painter_",
+           "board": "Доска Дворника 1",
+           "assignee": "Karlos"
+       }
+
+       response = requests.put(url, json=data, auth=(login, passsword))
+       print(response.content)
+
 #### Удаление Карточки
-	def delete_card():
-	    url = r'http://127.0.0.1:5000/api/v1/card/delete'
-	    headers = {'UserName': 'Bob', 'UserSecret':'123'}
-	    data = {
-	        "title": "Painter_",
-	        "board": "Доска Дворника 2"
-	    }
 
-	    response = requests.post(url, json=data, headers=headers)
-	    print(response.content)
+   def delete_card():
+       url = r'http://127.0.0.1:5000/api/v1/card/delete'
+       data = {
+           "title": "Painter_",
+           "board": "Доска Дворника 1"
+       }
+
+       response = requests.delete(url, params=data, auth=(login, passsword))
+       print(response.content)
+
 #### Отчет по колонке
 Этот отчет позволяет получить информацию о задачах, которые находятся в определенной колонке. Например, чтобы посмотреть сколько задач запланировано на определенного пользователя, сколько сейчас в работе, а сколько уже завершено.
 
-	def report():
-	    url = r'http://127.0.0.1:5000/api/v1/report/cards_by_column'
-	    headers = {'UserName': 'Bob', 'UserSecret':'123'}
-	    data = {
-	        "board": "Доска Дворника 2",
-	        "column": "Пойти",
-	        "assignee": "Karlos"
-			    }
-		response = requests.post(url, json=data, headers=headers)
-        print(response.json())
-#### Список пользователей
-	def board_list():
-	    url = r'http://127.0.0.1:5000/api/v1/board/list'
-	    headers = {'UserName': 'Bob', 'UserSecret':'123'}
+   def report():
+       url = r'http://127.0.0.1:5000/api/v1/report/cards_by_column'
+       data = {
+           "board": "Доска Дворника 1",
+           "column": "Пойти",
+           "assignee": "Karlos"
+   		    }
+       response = requests.get(url, params=data, auth=(login, passsword))
+       print(response.json())
 
-	    response = requests.get(url, headers=headers)
-	    print(response.json())
+#### Список пользователей
+   def board_list():
+       url = r'http://127.0.0.1:5000/api/v1/board/list'
+       response = requests.get(url, auth=(login, passsword))
+       print(response.json())

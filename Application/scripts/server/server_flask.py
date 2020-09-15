@@ -1,7 +1,8 @@
 from flask import Flask, request
 from functools import wraps
 import sys
-from scripts.logic.core_logic import Destributor, ErrorApi
+from scripts.logic.core_logic import Destributor, ErrorApi, super_logger
+from scripts.logic.auth import is_authentication
 
 
 app = Flask(__name__)
@@ -10,18 +11,21 @@ app = Flask(__name__)
 def authorization(func):
     @wraps(func)
     def wrapper():
-        a = func()
+        route_func = func()
         data = request.authorization
-        if data['username'] == 'Bob':
-            return a
-        return {"status": "error", "info": "Authentication Error"}
+        name = data['username']
+        password = data['password']
+        if is_authentication(name, password):
+            return route_func
+        super_logger.error(f"user: {name}: Authentication Error")
+        return {"status": False, "info": "Authentication Error"}
     return wrapper
 
 
 @app.route('/api/v1/user/list',  methods=['GET'])
 @authorization
 def user_list():
-    """ GET all user """
+    """GET all user."""
     user_name = request.authorization['username']
     status = Destributor(user_name).user_list()
     return status
