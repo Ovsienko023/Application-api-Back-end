@@ -91,9 +91,10 @@ def board_list():
     print(response.json())
 
 # user_list()
-# board_list()
+
 # create_board()
-delete_board()
+# board_list()
+# delete_board()
 # create_card()
 # update_card()
 # delete_card()

@@ -22,7 +22,7 @@ def authorization(func):
     return wrapper
 
 
-@app.route('/api/v1/user/list',  methods=['GET'])
+@app.route('/api/v3/user/list',  methods=['GET'])
 @authorization
 def user_list():
     """GET all user."""
@@ -31,7 +31,7 @@ def user_list():
     return status
 
 
-@app.route('/api/v1/board/create', methods=['POST'])
+@app.route('/api/v3/board/create', methods=['POST'])
 @authorization
 def board_creat():
     """
@@ -47,7 +47,7 @@ def board_creat():
     return status
 
 
-@app.route('/api/v1/board/delete', methods=['DELETE'])
+@app.route('/api/v3/board/delete', methods=['DELETE'])
 @authorization
 def board_delete():
     """
@@ -59,7 +59,7 @@ def board_delete():
     return status
 
 
-@app.route('/api/v1/board/list',  methods=['GET'])
+@app.route('/api/v3/board/list',  methods=['GET'])
 @authorization
 def board_list():
     """ GET all board """
@@ -69,7 +69,7 @@ def board_list():
     return status
 
 
-@app.route('/api/v1/card/create', methods=['POST'])
+@app.route('/api/v3/card/create', methods=['POST'])
 @authorization
 def card_create():
     """
@@ -88,7 +88,7 @@ def card_create():
     return status
 
 
-@app.route('/api/v1/card/update', methods=['PUT'])
+@app.route('/api/v3/card/update', methods=['PUT'])
 @authorization
 def card_update():
     """
@@ -104,7 +104,7 @@ def card_update():
     return status
 
 
-@app.route('/api/v1/card/delete', methods=['DELETE'])
+@app.route('/api/v3/card/delete', methods=['DELETE'])
 @authorization
 def card_delete():
     """
@@ -119,7 +119,7 @@ def card_delete():
     return status
  
 
-@app.route('/api/v1/report/cards_by_column', methods=['GET'])
+@app.route('/api/v3/report/cards_by_column', methods=['GET'])
 @authorization
 def report():
     """ 

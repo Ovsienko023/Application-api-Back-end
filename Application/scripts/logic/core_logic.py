@@ -7,10 +7,7 @@ import logging
 
 super_logger = MyLogging().setup_logger('core_logic',
                                         'Application/logger/logfile.log')#, logging.INFO)
-# super_logger_err = MyLogging().setup_logger('core_logic',
-#                                         'Application/logger/logfile_err.log', logging.ERROR)
-#super_logger.error('Error', exc_info=True)
-#super_logger.info()!!!!!!! читать
+
 class ErrorApi(Exception):
     pass
 
