@@ -3,39 +3,8 @@ from functools import wraps
 import sys
 from scripts.logic.core_logic import Destributor, ErrorApi
 
+
 app = Flask(__name__)
-
-
-def main(obj_client):
-    try:
-        status = obj_client.command_define()
-        print(status)
-        return status   
-    except ErrorApi:
-        return ''
-
-
-def post_request(command):
-    data = request.json
-    user_name = request.authorization['username']
-    obj_answer = Destributor(user_name, data=data)
-    answer = main(obj_answer)
-    if answer == "Error" or answer == 'DELETE 0' or answer == '':
-        return {"Error": "Value"}
-
-    if answer == 'ok' or answer == 'INSERT 0 1' or answer == 'DELETE 1':
-        return {"ok":True}
-    
-    if answer:
-        return answer
-    
-
-# def get_request(command):
-#     user_name, _ = request.authorization
-#     obj_answer = Destributor(user_name, command)
-#     print(obj_answer)
-#     answer = main(obj_answer)
-#     return answer
 
 
 def authorization(func):
@@ -43,13 +12,12 @@ def authorization(func):
     def wrapper():
         a = func()
         data = request.authorization
-        # print(data)
         if data['username'] == 'Bob':
             return a
         return {"status": "error", "info": "Authentication Error"}
     return wrapper
 
-#+++
+
 @app.route('/api/v1/user/list',  methods=['GET'])
 @authorization
 def user_list():
@@ -59,7 +27,6 @@ def user_list():
     return status
 
 
-# +++
 @app.route('/api/v1/board/create', methods=['POST'])
 @authorization
 def board_creat():
@@ -75,7 +42,7 @@ def board_creat():
     status = Destributor(user_name, data=data).board_creat()
     return status
 
-# +++
+
 @app.route('/api/v1/board/delete', methods=['DELETE'])
 @authorization
 def board_delete():
@@ -87,7 +54,7 @@ def board_delete():
     status = Destributor(user_name, data=data).board_delete()
     return status
 
-# +++
+
 @app.route('/api/v1/board/list',  methods=['GET'])
 @authorization
 def board_list():
@@ -97,7 +64,7 @@ def board_list():
     print(status)
     return status
 
-# +++
+
 @app.route('/api/v1/card/create', methods=['POST'])
 @authorization
 def card_create():
@@ -116,7 +83,7 @@ def card_create():
     status = Destributor(user_name, data=data).card_create()
     return status
 
-# +++
+
 @app.route('/api/v1/card/update', methods=['PUT'])
 @authorization
 def card_update():
@@ -132,7 +99,7 @@ def card_update():
     status = Destributor(user_name, data=data).card_update()
     return status
 
-# +++
+
 @app.route('/api/v1/card/delete', methods=['DELETE'])
 @authorization
 def card_delete():
@@ -147,7 +114,6 @@ def card_delete():
     status = Destributor(user_name, data=data).card_delete()
     return status
  
-
 
 @app.route('/api/v1/report/cards_by_column', methods=['GET'])
 @authorization
