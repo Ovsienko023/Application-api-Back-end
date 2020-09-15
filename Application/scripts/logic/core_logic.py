@@ -191,13 +191,13 @@ class SendObjDB:
         self.obj = obj
         self.cursor = ConnectDB()
 # Возможно не нужно!
-    def is_instance(self):
-        if isinstance(self.obj, Board):
-            status = self.save_board_in_db()
-            return status
-        if isinstance(self.obj, Card):
-            status = self.save_card_in_bd()
-            return status
+    # def is_instance(self):
+    #     if isinstance(self.obj, Board):
+    #         status = self.save_board_in_db()
+    #         return status
+    #     if isinstance(self.obj, Card):
+    #         status = self.save_card_in_bd()
+    #         return status
 
     
     def is_board(self, board_name):
@@ -452,46 +452,10 @@ class DataInJson:
         return obj
 
 
-class Destributor:  #ClientWrapper
+class Destributor:
     def __init__(self, user_name, data=None):
         self.user_name = user_name
         self.data = data
-
-    @classmethod
-    def crete_class(cls, data, clss, user_name):
-        data['user_name'] = user_name
-        data['times'] = time.time()
-        classes = {'board': Board, 'card': Card}
-        new_cls = classes[clss]
-        new_cls = new_cls.create_from_dict(data)
-        return new_cls
-
-    def command_define(self):
-        clss, command = self.commands.split('_')
-        if command == 'report':
-            lst_report = DataInDB.report(self.data)
-            return DataInJson.pars_for_rep(lst_report)
-
-        if command == 'create':
-            obj = Destributor.crete_class(self.data, clss, self.user_name)
-            status = SendObjDB(obj).is_instance()
-            return status
-
-        if command == 'delete':
-            status = str(DataInDB.delete(self.data, clss))
-            return status
-        
-        if command == 'update':
-            status = DataInJson.update_card(self.data, self.user_name)
-            return status
-
-        # if self.commands == 'user_list':
-            # return {"count" :len(DataInDB.get_users()['users']), 
-            #             "users": [{'username':i['user_name']} for i in DataInDB.get_users()['users']] }
-        
-        # if commands == 'board_list':
-        #     status = DataInDB.get_boards()
-        #     return status
 
     def user_list(self):
         try: 
@@ -499,11 +463,20 @@ class Destributor:  #ClientWrapper
                             "users": [{'username':i['user_name']} for i in DataInDB.get_users()['users']] }
             return status
         except ErrorApi:
-            return 'ErrorApi'
+            return {"status": False, "info": "ErrorApi"}
     
     def board_list(self):
         status = DataInDB.get_boards()
         return status
+
+    def response_handler(self, answer):
+        """Database Response Handler."""
+        if answer == "Error" or answer == 'DELETE 0' or answer == '':
+            return {"Error": "Value"}
+        if answer == 'ok' or answer == 'INSERT 0 1' or answer == 'DELETE 1':
+            return {"ok":True}
+        if answer:
+            return answer
 
     def board_creat(self):
         try:
@@ -511,15 +484,52 @@ class Destributor:  #ClientWrapper
             self.data['times'] = time.time()
             obj_board = Board.create_from_dict(self.data)
             answer = SendObjDB(obj_board).save_board_in_db()
-
-            if answer == "Error" or answer == 'DELETE 0' or answer == '':
-                return {"Error": "Value"}
-            if answer == 'ok' or answer == 'INSERT 0 1' or answer == 'DELETE 1':
-                return {"ok":True}
-            if answer:
-                return answer
+            answer = self.response_handler(answer)
+            return answer
         except ErrorApi:
-            return 'ErrorApi'
+            return {"status": False, "Error": "Value"}
 
+    def board_delete(self):
+        try:
+            answer = str(DataInDB.delete_board(self.data, self.user_name))
+            answer = self.response_handler(answer)
+            return answer
+        except ErrorApi:
+            return {"status": False, "Error": "Value"}
 
+    def card_create(self):
+        try:
+            self.data['user_name'] = self.user_name
+            self.data['times'] = time.time()
+            obj_board = Card.create_from_dict(self.data)
+            answer = SendObjDB(obj_board).save_card_in_bd()
+            answer = self.response_handler(answer)
+            return answer
+        except ErrorApi:
+            return {"status": False, "Error": "Value"}
     
+    def card_update(self):
+        try:
+            answer = DataInJson.update_card(self.data, self.user_name)
+            answer = self.response_handler(answer)
+            return answer
+        except ErrorApi:
+            return {"status": False, "Error": "Value"}
+    
+    def card_delete(self):
+        try:
+            title = self.data['title']
+            board = self.data['board']
+            answer = str(DataInDB.delete_card(title, board))
+            answer = self.response_handler(answer)
+            return answer
+        except ErrorApi:
+            return {"status": False, "Error": "Value"}
+
+    def report(self):
+        try:
+            lst_report = DataInDB.report(self.data)
+            print(lst_report)
+            return DataInJson.pars_for_rep(lst_report)
+        except ErrorApi:
+            return {"status": False, "Error": "Value"}

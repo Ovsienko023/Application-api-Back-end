@@ -10,7 +10,7 @@ def user_list():
     response = requests.get(url, auth=(login, passsword))
     print(response.json())
 
-# user_list()
+
 
 def create_board():
     url = r'http://127.0.0.1:5000/api/v1/board/create'
@@ -24,55 +24,52 @@ def create_board():
     response = requests.post(url, json=data, auth=(login, passsword))
     print(response.content)
 
-# create_board()
+
 
 def delete_board():
     url = r'http://127.0.0.1:5000/api/v1/board/delete'
     data = {
-        "title": "Доска Дворника 2",
+        "title": "Доска Дворника 1",
     }
 
-    response = requests.delete(url, json=data, auth=(login, passsword))
+    response = requests.delete(url, params=data, auth=(login, passsword))
     print(response.json())
-delete_board()
+
 
 def create_card():
     url = r'http://127.0.0.1:5000/api/v1/card/create'
-    headers = {'UserName': 'Bob', 'UserSecret':'123'}
     data = {
         "title": "Painter_",
-        "board": "Доска Дворника 2",
+        "board": "Доска Дворника 1",
         "status": "Пойти",
         "description": "Необходимо за весь карантин не поехать кукухой ",
         "assignee": "Mark",
         "estimation": "1m"
     }
-    response = requests.post(url, json=data, headers=headers)
-    print(response.content)
+    response = requests.post(url, json=data, auth=(login, passsword))
+    print(response.json())
 
 
 def update_card():
     url = r'http://127.0.0.1:5000/api/v1/card/update'
-    headers = {'UserName': 'Bob', 'UserSecret':'123'}
     data = {
         "title": "Painter_",
-        "board": "Доска Дворника 2",
+        "board": "Доска Дворника 1",
         "assignee": "Karlos"
     }
 
-    response = requests.post(url, json=data, headers=headers)
+    response = requests.put(url, json=data, auth=(login, passsword))
     print(response.content)
 
 
 def delete_card():
     url = r'http://127.0.0.1:5000/api/v1/card/delete'
-    headers = {'UserName': 'Bob', 'UserSecret':'123'}
     data = {
         "title": "Painter_",
-        "board": "Доска Дворника 2"
+        "board": "Доска Дворника 1"
     }
 
-    response = requests.post(url, json=data, headers=headers)
+    response = requests.delete(url, params=data, auth=(login, passsword))
     print(response.content)
 
 
@@ -83,20 +80,20 @@ def report():
         "column": "Пойти",
         "assignee": "Karlos"
 		    }
-    response = requests.post(url, params=data, auth=(login, passsword))
+    response = requests.get(url, params=data, auth=(login, passsword))
     print(response.json())
 
-    # url = 'http://ru.stackoverflow.com/search?q=question'
-    # # Параметры запроса
-    # params = {
-    #     'tag': 'python',
-    # }
-    # # Ответ
-    # r = requests.get(url=url, params=params)
 
 def board_list():
     url = r'http://127.0.0.1:5000/api/v1/board/list'
     response = requests.get(url, auth=(login, passsword))
     print(response.json())
 
+# user_list()
 # board_list()
+# create_board()
+# delete_board()
+# create_card()
+# update_card()
+# delete_card()
+# report()
